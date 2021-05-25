@@ -1,0 +1,12 @@
+.participantArea{
+    position: relative;
+    width:100%;
+    height:100%;
+}
+.participant{
+    width:80%;
+    overflow-wrap: break-word;
+    margin:10%;
+    background-color: greenyellow;
+    border-radius: 20px;
+}
