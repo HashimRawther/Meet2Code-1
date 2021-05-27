@@ -23,7 +23,7 @@
     background-color: #ddbbbb;
 }
 .com-navbar{
-    background-color: aqua;
+    background-color: white;
     display: grid;
     grid-template-columns: repeat(3,minmax(33%,auto));
 }
@@ -68,7 +68,8 @@
     background-color:rgb(156, 76, 51);
 }
 .DocEditing{
-    background-color: rgb(92, 79, 75);
+    background-color: #F3F3F3;
+    margin:0;
 }
 
 

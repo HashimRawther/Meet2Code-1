@@ -24,7 +24,7 @@ class Container extends Component {
     }
     render() { 
         return (  
-            <div className='container'>
+            <div className='outer-container'>
                 <div className='tools-section'>
                     <div className='color-picker-container'>
                         Select brush color : &nbsp;
