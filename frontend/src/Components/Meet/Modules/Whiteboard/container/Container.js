@@ -43,7 +43,7 @@ class Container extends Component {
                     </div>
                 </div>
                 <div className='board-container'>
-                    <Board color={this.state.color} size={this.state.size} image={this.props.image} socket={this.props.socket} flag={this.props.flag} setFlag={this.props.setFlag} ctx={this.props.ctx} setctx={this.props.setctx} timeout={this.props.timeout} settimeOut={this.props.settimeOut}/>
+                    <Board color={this.state.color} size={this.state.size} image={this.props.image} socket={this.props.socket} ctx={this.props.ctx} setctx={this.props.setctx} timeout={this.props.timeout} settimeOut={this.props.settimeOut}/>
                 </div>
             </div>
         );

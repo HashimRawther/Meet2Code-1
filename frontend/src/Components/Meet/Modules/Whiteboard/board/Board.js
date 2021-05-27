@@ -2,17 +2,16 @@ import React, { useEffect } from 'react';
 import './board.css';
 const Board=(props)=> {
     useEffect(()=>{
-        if(props.flag===true) return;
+        if(props.ctx===undefined) return;
         props.ctx.strokeStyle = props.color;
         props.ctx.lineWidth = props.size;
-        if(props.image!==undefined)
+        if(props.image!==undefined && props.image.src!=="http://localhost:3000/null")
             props.ctx.drawImage(props.image,0,0);
     },[props]);
     
     useEffect(()=>{
         var canvas = document.querySelector('#board');
         const drawOnCanvas=(canvas)=>{
-            props.setFlag('false');
             var ctx = canvas.getContext('2d');
             props.setctx(ctx);
             var sketch = document.querySelector('#sketch');
@@ -34,10 +33,10 @@ const Board=(props)=> {
     
     
             /* Drawing on Paint App */
-            ctx.lineWidth = props.size;
+            ctx.lineWidth = 5;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
-            ctx.strokeStyle = props.color;
+            ctx.strokeStyle = "black";
     
             canvas.addEventListener('mousedown', function(e) {
                 canvas.addEventListener('mousemove', onPaint, false);

@@ -18,7 +18,6 @@ const Meet = () => {
     const [messages,setMessages] = useState([]);
     const [message,setMessage] = useState('');
     const [usersInRoom,setUsersInRoom] = useState([]);
-    const [flag,setFlag] = useState(true);
     const [ctx,setctx] = useState();
     const [timeout,settimeOut] = useState();
     const [image,setImage] = useState();
@@ -36,49 +35,38 @@ const Meet = () => {
         setRoom(room);
 
         socket.emit('join',{name,room},()=>{
-        });
-        socket.emit('newuser');
-        
+        });        
         return () =>{
             // socket.emit('disconnect');
             socket.off();
         }
     },[ENDPOINT]);
     useEffect(()=>{
+        socket.on('message',(message)=>{
+            setMessages([...messages,message]);
+        })
+        socket.on("roomData", ({ users }) => {
+            setUsersInRoom(users);
+        });
         socket.on("canvas-data",function(data){
             var image= new Image();
             image.onload=function(){
+                if(ctx===undefined) return;
                 ctx.drawImage(image,0,0);
             };
             image.src = data;
             setImage(image);
         })
-        return()=>{
-            socket.off();
-        }
-    },[ctx])
-    useEffect(()=>{
-        socket.on('userjoined',function(users){
-            setUsersInRoom(users);
-            console.log("hello");
-        });
         return() => {
             socket.off();
         }
-    },[usersInRoom])
-    useEffect(()=>{
-        socket.on('message',(message)=>{
-            setMessages([...messages,message]);
-        })
-        return() => {
-            socket.off();
-        }
-    },[messages]);
+    },[messages,ctx]);
 
     const sendMessage=(e)=>{
         e.preventDefault();
         if(message){
-            socket.emit('sendMessage',message,()=>setMessage(''));
+            socket.emit('sendMessage',message,()=>{setMessage('')
+        });
         }
     }
     return (  
@@ -125,7 +113,7 @@ const Meet = () => {
                         ( 
                             page===1?
                             <div className="DocEditing"></div>
-                            :<div className="WhiteBoard"><Container image={image} socket={socket} flag={flag} setFlag={setFlag} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
+                            :<div className="WhiteBoard"><Container image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
                         )
                     }
                 </div>
