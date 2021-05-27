@@ -4,7 +4,7 @@ const Participant = ({users}) => {
         <div className='participantArea'>
             {users.map(({name}) => (
                   <div key={name} className="participant">
-                    {name}
+                    <p>{name}</p>
                   </div>
             ))}
         </div>

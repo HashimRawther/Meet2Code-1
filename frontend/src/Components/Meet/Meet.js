@@ -9,6 +9,15 @@ import './Meet.css';
 import Participant from './Modules/Participants/Participant';
 import Container from './Modules/Whiteboard/container/Container';
 import TextEditor from './Modules/DocEditor/TextEditor';
+import logo from '../../Images/logo.jpg';
+import video from '../../Images/video.png';
+import chat from '../../Images/chat.png';
+import user from '../../Images/user.png';
+import videoOn from '../../Images/videoOn.png';
+import videoOff from '../../Images/videoOff.png';
+import mute from '../../Images/mute.png';
+import unmute from '../../Images/unmute.png';
+import endCall from '../../Images/endCall.png';
 let socket;
 
 const SAVE_INTERVAL_MS = 2000
@@ -36,6 +45,8 @@ const Meet = () => {
     const [timeout,settimeOut] = useState();
     const [image,setImage] = useState();
     const [quill, setQuill] = useState();
+    const [camon,setcamon] = useState(true);
+    const [micon,setmicon] = useState(true);
 
     const ENDPOINT = 'http://localhost:5000';
     useEffect(()=>{
@@ -141,14 +152,15 @@ const Meet = () => {
     return (  
         <div className='meet'>
             <div className='logo-container'>
+                <img src={logo} alt='logo' width='70' height='66'/> 
                 <h1>{room}/{name}</h1>
             </div>
             <div className='useroptions-container'></div>
             <div className='communication-container'>
                 <div className="com-navbar">
-                    <button onClick={()=>setCom(0)}>1</button>
-                    <button onClick={()=>setCom(1)}>2</button>
-                    <button onClick={()=>setCom(2)}>3</button>
+                    <button onClick={()=>setCom(0)}><img src={video} alt='video' width='40' height='40' /></button>
+                    <button onClick={()=>setCom(1)}><img src={chat} alt='chat' width='40' height='40' /></button>
+                    <button onClick={()=>setCom(2)}><img src={user} alt='user' width='40' height='40' /></button>
                 </div>
                 <div className="com-overview">
                     {
@@ -188,7 +200,11 @@ const Meet = () => {
                 </div>
             </div> 
             
-            <div className='com-features-container'></div>
+            <div className='com-features-container'>
+                <button onClick={()=>setmicon(!micon)}>{micon?<img src={unmute} alt='video' width='40' height='40' />:<img src={mute} alt='video' width='40' height='40' />}</button>
+                <button><img src={endCall} alt='video' width='40' height='40' /></button>
+                <button onClick={()=>setcamon(!camon)}>{camon?<img src={videoOn} alt='video' width='40' height='40' />:<img src={videoOff} alt='video' width='40' height='40' />}</button>
+            </div>
         </div>
     );
 }

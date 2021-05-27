@@ -11,7 +11,7 @@ const Message = ({message:{user,text},name}) => {
         isSentByCurrentUser
         ?(
             <div className='message justifyEnd'>
-                <p className='senttext pr'>{trimmedName}</p>
+                <p className='senttext pr'>You</p>
                 <div className="messageBox backgroundBlue">
                     <p className='msgtext'>{text}</p>
                 </div>

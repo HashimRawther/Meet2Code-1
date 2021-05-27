@@ -1,9 +1,20 @@
 .logo-container{
-    background-color: #9c5454;
+    background-color:#363434;
+    display: flex;
+}
+.logo-container img{
+    border-radius: 100px;
+    margin-top: 3px;
+    margin-left:10px;
+}
+.logo-container h1{
+    margin-top: 20px;
+    margin-left: 10px;
+    color:white;
 }
 .useroptions-container{
     grid-column: span 3;
-    background-color: #a30d0d;
+    background-color: #363434;
 }
 .communication-container{   
     grid-row: span 9;
@@ -20,12 +31,30 @@
     grid-template-columns: repeat(25,minmax(4%,4%));
 }
 .com-features-container{
-    background-color: #ddbbbb;
+    background-color: #363434;
+    display: grid;
+    grid-template-columns: repeat(3,minmax(33%,auto));
+}
+.com-features-container button{
+    background: none;
+    border: none;
+    outline: none;
+}
+.com-features-container button:hover{
+    cursor: pointer;
 }
 .com-navbar{
     background-color: white;
     display: grid;
     grid-template-columns: repeat(3,minmax(33%,auto));
+}
+.com-navbar button{
+    background-color: #363434;
+    outline: none;
+    border:none;
+}
+.com-navbar button:hover{
+    cursor: pointer;
 }
 .com-overview{
     grid-row: span 19;
@@ -68,19 +97,20 @@
     background-color:rgb(156, 76, 51);
 }
 .DocEditing{
-    background-color: #F3F3F3;
+    background-color: #ac9e9e;
     margin:0;
+    max-height: 700px;
 }
 
 
 .VideoArea{
-    background-color: #412d2d;
+    background-color: #363434;
 }
 .ChatArea{
-    background-color: #ac7e7e;
+    background-color: #363434;
 }
 .ParticipantsArea{
-    background-color: #923030;
+    background-color: #363434;
 }
 .meet{
     background-color: black;
