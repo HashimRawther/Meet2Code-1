@@ -32,7 +32,8 @@
     color:white;
 }
 .msgtext{
-  padding: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
   overflow-wrap: break-word;
 }
 ::-webkit-scrollbar {

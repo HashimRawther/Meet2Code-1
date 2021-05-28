@@ -1,33 +1,103 @@
-const express = require('express');
-const socketio = require('socket.io');
-const http = require('http');
-const cors = require('cors');
 const {addUser,removeUser,getUser,getUsersInRoom, setData, getData} = require('./users');
 
-const mongoose = require("mongoose")
-const Document = require("./Document")
+const express=require("express");
+      app=express();
+      bodyParser=require("body-parser");
+      cors=require("cors");
+      socket=require("socket.io");
+      http=require("http");
+      oauth=require('./Routers/oauth');
+      room=require('./Routers/room');
+      path=require('path');
+      session = require("express-session");
+      Room=require('./Schemas/room')
+const { v4: uuid } = require('uuid');
 
-mongoose.connect("mongodb://localhost/google-docs-clone", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true,
-})
+const Document = require("./Schemas/Document")
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 9000;
 
-const router = require('./router');
-
-const app = express();
-const server = http.createServer(app);
-const io = socketio(server);
+const router = require('./Routers/router');
 
 app.use(router);
-app.use(cors());
+app.use(cors({credentials:true, origin:["http://localhost:3000"]}));
+app.options('*', cors());
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.json({limit: '50mb'}));   
+app.use(express.static(path.join(__dirname,'/public')));
+
+app.use(session({
+    resave:true,
+    secret:"Failures are the stepping stones of success",
+    saveUninitialized:true,
+    name:"meet2codeCookie",
+    cookie : {
+          maxAge: 1000* 60 * 60 *24 * 365,
+          secure:false,
+      }
+
+}))
+
+let loggedinUserDetails=(req,res,next)=>{
+    let loggedin=0;
+    let user={};
+    if(req.session.loggedin==true){
+        loggedin=1;
+        user=req.session.user;
+    }
+    res.locals={user:user,loggedin:loggedin};
+    next();
+}
+app.use(loggedinUserDetails);
+
+let isLoggedin=(req,res,next)=>{
+    if(req.session.loggedin)
+        next();
+    else
+    {     
+          // res.status(404).json({"log_data":"Not logged in",...res.locals})
+          res.status(401).send("Not logged in");
+    }
+}
+
+//Check if the user is not already logged in
+let notLoggedin=(req,res,next)=>{
+    // console.log(req.session)
+    if(req.session.loggedin==undefined || req.session.loggedin==null)
+        next();
+    else
+        res.status(404).json({log_data:"Already logged in",...res.locals})
+}
+const server = http.createServer(app);
+const io = socket(server);
 
 const defaultValue = ""
 
 io.on('connection',(socket)=>{
+    socket.on('createRoom',async(arg,redirect)=>{
+        let roomId=uuid();
+        console.log(roomId)
+        socket.join(`${roomId}`);
+        try{
+        let room=new Room({
+            ...arg,
+            roomId:roomId
+        })
+        room=await room.save()
+        redirect(roomId);
+        }
+        catch(e){
+            redirect(undefined)
+        }
+    })
+
+    socket.on('test',arg=>{
+        console.log(socket.rooms)
+    })
+    
+    socket.on('closeConnection',arg=>{
+        socket.leave(`${arg.room}`)
+    })
     socket.on('join',({name,room},callback)=>{
         const {error,user}= addUser({id:socket.id,name,room});
         if(error) return callback(error);
@@ -81,7 +151,10 @@ async function findOrCreateDocument(id) {
     return await Document.create({ _id: id, data: defaultValue })
 }
 
+app.set('socketio',io)
 
+app.use('/oauth',oauth);
+app.use('/room',room);
 server.listen(PORT,()=>{
     console.log('Server started on port: ',PORT);
 });

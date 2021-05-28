@@ -48,7 +48,7 @@ const Meet = () => {
     const [camon,setcamon] = useState(true);
     const [micon,setmicon] = useState(true);
 
-    const ENDPOINT = 'http://localhost:5000';
+    const ENDPOINT = 'http://localhost:9000';
     useEffect(()=>{
         const {name,room} =queryString.parse(window.location.search);
         var connectionOptions =  {
