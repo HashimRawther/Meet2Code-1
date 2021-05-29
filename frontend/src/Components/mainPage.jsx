@@ -62,7 +62,6 @@ const MainPage=(props)=>{
     }
 
     let toggleOpen=(type)=>{
-        let form;
         if(type==="create"){
             let createForm=document.getElementById("mainPageCreateRoomPadding")
             if(createShow===true)
@@ -73,6 +72,10 @@ const MainPage=(props)=>{
         }
         else if(type==="join"){
             let joinForm=document.getElementById("mainPageJoinRoomPadding")
+            let infoText=document.getElementById("infoTextJoinRoom")
+            if(infoText!==null){
+                infoText.innerText=""
+            }
             if(joinShow===true)
                 joinForm.style.padding="20px"
             else
@@ -81,34 +84,141 @@ const MainPage=(props)=>{
         }
 
     }
+
+    //Join the already existing room.
+    let joinExistingRoom=(id)=>{
+        console.log(id);
+        history.push(`/room/${id}`)
+    }
+
+    let leaveExistingRoom=()=>{
+        socket.emit('leaveRoom',{host:props.user._id},(status)=>{
+            console.log(status)
+            let btnclose = document.getElementById('w-change-close');
+            btnclose.click()
+        })
+
+    }
+    //Leave the existing room.
+
     let createRoom=async(formData)=>{
 
         let body={}
         for(let pair of formData)
             body[`${pair[0]}`]=pair[1]
 
-        socket.emit('createRoom',{...body},(roomId)=>{
-            if(roomId!==undefined && roomId!==null){
+        socket.emit('createRoom',{...body, host:props.user._id},(roomId,status)=>{
+            if(status===200 && roomId!==undefined && roomId!==null){
                 console.log(roomId);
                 history.push(`/room/${roomId}`)
             }
-            else{
-                //Display Creation of room failed
+            else if(status===401){
+                //User is already in a room.
+                // var myModal = new bootstrap.Modal(document.getElementById('myModal'), options)
+                // id="w-change-location" data-toggle="modal" data-target="#locModal"
+                showModal(roomId)
+            }
+        })
+    }
+
+    //Join room
+    let joinRoom=async(formData)=>{
+
+        //Form validation pending
+        let body={}
+        for(let pair of formData)
+            body[`${pair[0]}`]=pair[1]
+        console.log(body)
+        let infoText=document.getElementById("infoTextJoinRoom")
+        //Emit the details of the room and join the room.
+        socket.emit('joinRoom',{...body,participant:props.user._id},(roomId,status)=>{
+
+            if(status===401){
+                //User is already in a room.
+                showModal(roomId)
+                return
+            }
+            //If the password given is wrong
+            else if(status===403){
+
+                if(infoText!==null){
+                    infoText.innerText="Incorrect Password Provided"
+                }
+                return
+            }
+            //If room doesn't exist
+            else if(status===404){
+                if(infoText!==null){
+                    infoText.innerText="Room Doesn't exist"
+                }
+            }
+
+            //Successful join
+            else if(status===200 && roomId!==undefined && roomId!==null){
+                history.push(`/room/${roomId}`)
             }
         })
 
-        // let resp=await fetch(`${serverEndpoint}/room`,{
-        //     method:"post",
-        //     credentials:"include",
-        //     headers:{'Content-Type':'application/json'},
-        //     body:JSON.stringify(body)
-        // })
-        // resp=await resp.json()
     }
 
+    let showModal=(roomId)=>{
+        var locModal = document.getElementById('locModal');
+        var btnclose = document.getElementById('w-change-close');
+        var top=document.getElementById("mainPageWrapper");
+        let rejoin=document.getElementById("reJoinRoom");
+        let leave=document.getElementById("leaveJoinedRoom")
+
+        locModal.style.display = "block";
+        locModal.style.paddingRight = "17px";
+        locModal.className="modal fade show";
+        top.classList.add("enableOverlay");
+
+        rejoin.onclick=()=>{
+            joinExistingRoom(roomId)
+        }
+        leave.onclick=()=>{
+            leaveExistingRoom()
+        }
+        //hide the modal
+        btnclose.addEventListener('click', (e) => {
+            console.log("Clicked")
+            locModal.style.display = "none";
+            locModal.className="modal fade";
+            top.classList.remove("enableOverlay") 
+        });
+    }
+
+    //Display modal if user is already in a room.
+    let modalDisplay=()=>{
+        return(
+               <div className="modalAlreadyJoined">
+                    <div className="modal fade modalAlreadyJoined p-5" id="locModal" tabIndex="-1" role="dialog" aria-labelledby="locModalLabel"
+                        aria-hidden="true">
+                        <div className="modal-dialog modalAlreadyJoined" role="document">
+                            <div className="modal-content modalAlreadyJoined">
+                                <div className="modal-header modalAlreadyJoined justify-content-center" style={{border:"none"}}>
+                                    <h5 className="modal-title modalAlreadyJoined" id="locModalLabel">You've already joined a room.</h5>
+                                </div>
+                                <div className="modal-body modalAlreadyJoined" style={{border:"none"}}>
+                                    <div className="d-flex flex-row justify-content-between"> 
+                                        <button className="col-5  modalAlreadyJoinedButton" id="reJoinRoom">Re-Join</button>
+                                        <button className="col-5  modalAlreadyJoinedButton" id="leaveJoinedRoom">Leave</button>
+                                    </div>
+                                </div>
+                                <div className="modal-footer modalAlreadyJoined justify-content-center" style={{border:"none"}}>
+                                    <button id="w-change-close" type="button" className="btn btn-secondary">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+               </div>
+        )
+    }
 
     return (
         <React.Fragment>
+        {modalDisplay()}
+        <div  id="mainPageWrapper">
         <div>
             <div className="container-lg homePageTopBar mt-2 d-flex flex-sm-row align-items-center justify-content-center-sm justify-content-end" >
 
@@ -135,7 +245,7 @@ const MainPage=(props)=>{
                 <div className="col-sm-3 col-1 container-lg justify-content-center profileDropdown" style={{textAlign:"center", cursor:"pointer"}}>
                     
                     <div className="profileDropdown"  onClick={()=>{toggleDropDown()}}>
-                        <img src={`${props.user.imageUrl}`} className="homePageUserDP " ></img>
+                        <img src={`${props.user.imageUrl}`} className="homePageUserDP " alt="" ></img>
                         <div className="profileDropdown-content mt-2" id="profileDropdown-content">
                             <div className="profileDropdown-content-list d-flex flex-column ">
                                 <div className="col d-flex flex-row align-items-center justify-content-around">
@@ -162,7 +272,7 @@ const MainPage=(props)=>{
                             <div className="mainPageCreateRoomHeaderOff d-flex flex-row justify-content-between align-items-center" onClick={(e)=>{toggleOpen("create")}} style={{cursor:"pointer"}}>
                                 <span className="col-5">New Room</span>
                                 <img className="col-2" src='./icons/drop-down.png' style={{width:"16px", height:"16px"}}
-                                
+                                alt=""
                                 ></img>
                             </div>
                             {createShow===true?
@@ -196,6 +306,7 @@ const MainPage=(props)=>{
                                             </div>
                                             <div className="mt-3 col-6">
                                                 <button className="mainPageCreateRoomFormSubmit" type="submit"
+                                                id="mainPageCreateRoomButtonToggleModal"
                                                 onClick={async(e)=>{
                                                     e.preventDefault()
                                                     const formData = new FormData(document.getElementById('mainPageCreateRoomForm'));
@@ -220,7 +331,7 @@ const MainPage=(props)=>{
                             <div className="mainPageCreateRoomHeader d-flex flex-row justify-content-between align-items-center" onClick={(e)=>{toggleOpen("join")}} style={{cursor:"pointer"}}>
                                 <span className="col-5">Join a Room</span>
                                 <img className="col-2" src='./icons/drop-down.png' style={{width:"16px", height:"16px"}} 
-                                
+                                alt=""
                                 ></img>
                             </div>
                             {joinShow===true?
@@ -233,7 +344,7 @@ const MainPage=(props)=>{
                                         <div className="d-flex flex-column">
                                                 <div className="d-flex flex-row justify-content-between align-items-center">
                                                     <div className="col-8 mainPageCreateRoomFormName">
-                                                        <input className="" autoComplete="off" name="name" placeholder="Room Id"></input>
+                                                        <input className="" autoComplete="off" name="id" placeholder="Room Id"></input>
                                                     </div>
                                                     <div className="col-3 mainPageCreateRoomFormTypeWrapper">
                                                         <select className="mainPageCreateRoomFormType" name="type" id="mainPageJoinRoomFormType" onClick={(e)=>{showPwd("join")}}>
@@ -247,14 +358,16 @@ const MainPage=(props)=>{
                                             <div className="col-5 mt-3 mainPageCreateRoomFormPassword">
                                                     <input className="" type="password" name="password" placeholder="Room Password">
                                                     </input>
-                                                </div>:""}
+                                            </div>:""}
+
+                                            <div className="mt-1 " id="infoTextJoinRoom" style={{color:"#fd4d4d", fontSize:"14px"}}>
+                                            </div>
                                             <div className="mt-3 col-6">
                                                 <button className="mainPageCreateRoomFormSubmit" type="submit"
                                                 onClick={async(e)=>{
                                                     e.preventDefault()
                                                     const formData = new FormData(document.getElementById('mainPageJoinRoomForm'));
-                                                    console.log(...formData)
-                                                    // await createRoom(formData)
+                                                    await joinRoom(formData);
                                                 }}
                                                 >
                                                     Join Room
@@ -269,7 +382,7 @@ const MainPage=(props)=>{
                     </div>
                 </div>
             </div>
-
+            </div>
         </div>
         </React.Fragment>
     )

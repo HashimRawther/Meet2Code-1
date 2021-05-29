@@ -10,7 +10,9 @@ const express=require("express");
       room=require('./Routers/room');
       path=require('path');
       session = require("express-session");
-      Room=require('./Schemas/room')
+      mongoose = require("mongoose");
+      Room=require('./Schemas/room');
+      User=require('./Schemas/user');
 const { v4: uuid } = require('uuid');
 
 const Document = require("./Schemas/Document")
@@ -56,7 +58,8 @@ let isLoggedin=(req,res,next)=>{
     else
     {     
           // res.status(404).json({"log_data":"Not logged in",...res.locals})
-          res.status(401).send("Not logged in");
+          res.status(401);
+          return res.redirect(`${clientEndPoint}`);
     }
 }
 
@@ -69,25 +72,115 @@ let notLoggedin=(req,res,next)=>{
         res.status(404).json({log_data:"Already logged in",...res.locals})
 }
 const server = http.createServer(app);
-const io = socket(server);
+const io = socket(server,{cors: {
+    cors: true,
+      origins: ["http://localhost:3000","192.168.0.13:3000","https://60a2be5a6ea5e300a1a9aca2--elegant-edison-5499d4.netlify.app"],
+      methods: ["GET", "POST"]
+    }
+});
+
+const getClients=()=>{
+
+}
 
 const defaultValue = ""
 
 io.on('connection',(socket)=>{
     socket.on('createRoom',async(arg,redirect)=>{
         let roomId=uuid();
-        console.log(roomId)
         socket.join(`${roomId}`);
         try{
-        let room=new Room({
-            ...arg,
-            roomId:roomId
-        })
-        room=await room.save()
-        redirect(roomId);
+            //Get the details of user who emitted the event
+            let user=await User.findById(arg.host)
+
+            if(user['room']!==undefined && user['room']!==null){       //Check if user is already in a room
+                console.log(401)
+                let room=await Room.findById(user['room'])
+                redirect(room.roomId,401)
+                return
+            }
+            //Create room with the arguments sent along with the newly created roomId
+            let room=new Room({
+                ...arg,
+                roomId:roomId,
+            })
+            room=await room.save()
+
+            //Update the user info with the new socket id and the room id
+            user['room']=room._id
+            user['socketId']=socket.id
+            await user.save()
+            console.log(room);
+            redirect(roomId,200);   //Created Successfully redirect with 200
         }
         catch(e){
-            redirect(undefined)
+            console.log(e)
+            redirect(undefined,404)
+        }
+    })
+    //Join an existing room
+    socket.on('joinRoom',async(arg,redirect)=>{
+        try{
+            let room=await Room.findOne({roomId: arg.id}) //Get the room details
+            if(room===undefined || room===null){    //Room doesn't exist
+                redirect(undefined,404)
+                return
+            }
+            //Get the details of user who emitted the event
+            let user=await User.findById(arg.participant)
+
+            if(user['room']!==undefined && user['room']!==null && user['room']!==room._id){       //Check if user is already in a room and not in the given room
+                redirect(room.roomId,401)
+                return
+            }
+            if(room['type']==="private" && room['password']!==arg.password){        //If private and password is not correct
+                redirect(undefined, 403);    
+                return;           
+            }
+            if(user['room']!=room._id){                         //If the user doesn't already exist
+
+                room['participants'].push(user._id);
+                user['room']=room._id
+            }
+            //Update user and room details and call client redirect function
+            await room.save();          
+            await user.save();  
+            redirect(room.roomId,200); 
+        }
+        catch(e){
+            console.log(e)
+            redirect(undefined,404)
+        }
+
+    })
+    socket.on('leaveRoom',async(arg,redirect)=>{
+        try{
+            //Get the details of user who emitted the event
+            let user=await User.findById(arg.host);
+            let room=await Room.findById(user['room'])
+            if(room!==undefined && room!==null){
+                //Delete the room if the host has ended the meeting
+                if(room['host']===mongoose.Types.ObjectId(arg.host)){
+                    console.log(room['host'],mongoose.Types.ObjecId(arg.host))
+                    //Emit an end room event to all participants of the room 
+                    // socket.to(room['roomId']).emit('endRoom')
+                    await Room.findByIdAndDelete(room._id)
+                }
+                //Remove the participant from the room
+                else{
+                    room['participants'].splice(room['participants'].indexOf(user._id),1);
+                    console.log(room);
+                    await room.save();
+                }
+                //Remove the room from the user
+                user['room']=undefined
+                await user.save()
+                redirect("Success",200)
+            }
+        }
+        catch(e){
+            console.log(e)
+            redirect(undefined,404)
         }
     })
 
@@ -98,16 +191,33 @@ io.on('connection',(socket)=>{
     socket.on('closeConnection',arg=>{
         socket.leave(`${arg.room}`)
     })
-    socket.on('join',({name,room},callback)=>{
-        const {error,user}= addUser({id:socket.id,name,room});
-        if(error) return callback(error);
-        socket.join(user.room);
-        data=getData(user.room);
-        socket.emit('message',{user:'admin',text:`${user.name},welcome to the room ${user.room}`});
-        socket.broadcast.to(user.room).emit('message',{user:'admin',text:`${user.name}, has joined`});
-        io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
-        io.to(user.room).emit('canvas-data',data);
-        callback();
+    socket.on('join',async (arg,callback)=>{
+        try{
+            let room=arg.roomID;
+            let name=arg.name;
+            console.log(room);
+            let userRoom=await Room.findOne({roomId: room}) //Get the room details
+            if(userRoom===undefined || userRoom===null){    //Room doesn't exist
+                // redirect(undefined,404)
+                console.log("cant read room");
+                return
+            }
+            const {error,user}= addUser({id:socket.id,name,room});
+            if(error) return callback(error);
+            socket.join(user.room);
+            data=getData(user.room);
+            socket.emit('message',{user:'admin',text:`${user.name},welcome to the room ${userRoom['name']}`});
+            socket.broadcast.to(user.room).emit('message',{user:'admin',text:`${user.name}, has joined`});
+            io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
+            io.to(user.room).emit('canvas-data',data);
+            callback(userRoom['name']);
+        }
+        catch(e)
+        {
+            console.log(e)
+            redirect(undefined,404)
+        }
+
     });
     socket.on('canvas-data',(data)=>{
         const user = getUser(socket.id);

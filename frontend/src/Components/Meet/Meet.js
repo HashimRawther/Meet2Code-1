@@ -1,4 +1,5 @@
 import React,{useState,useEffect,useCallback} from 'react';
+import { useParams } from "react-router-dom";
 import queryString from 'query-string';
 import io from 'socket.io-client';
 import Quill from "quill"
@@ -33,7 +34,8 @@ const TOOLBAR_OPTIONS = [
   ["clean"],
 ]
 
-const Meet = () => {
+const Meet = (props) => {
+    const { id: roomID } = useParams()
     const [page,setpage] = useState(0);
     const [com,setCom] = useState(0);
     const [name,setName] = useState('');
@@ -47,10 +49,9 @@ const Meet = () => {
     const [quill, setQuill] = useState();
     const [camon,setcamon] = useState(true);
     const [micon,setmicon] = useState(true);
-
+    const [roomName,setRoomName] = useState();
     const ENDPOINT = 'http://localhost:9000';
     useEffect(()=>{
-        const {name,room} =queryString.parse(window.location.search);
         var connectionOptions =  {
             "force new connection" : true,
             "reconnectionAttempts": "Infinity", 
@@ -58,16 +59,18 @@ const Meet = () => {
             "transports" : ["websocket"]
         };
         socket = io(ENDPOINT,connectionOptions);
-        setName(name);
-        setRoom(room);
-
-        socket.emit('join',{name,room},()=>{
+        let name = props.user.login;
+        setName(name)
+        setRoom(roomID);
+        console.log(roomID);
+        socket.emit('join',{name,roomID},(roomName)=>{
+            setRoomName(roomName);
         });        
         return () =>{
             // socket.emit('disconnect');
             socket.off();
         }
-    },[ENDPOINT]);
+    },[ENDPOINT,roomID,props.user.login]);
     useEffect(() => {
         if (socket == null || quill == null) return
     
@@ -153,7 +156,7 @@ const Meet = () => {
         <div className='meet'>
             <div className='logo-container'>
                 <img src={logo} alt='logo' width='70' height='66'/> 
-                <h1>{room}/{name}</h1>
+                <h1>{roomName}</h1>
             </div>
             <div className='useroptions-container'></div>
             <div className='communication-container'>

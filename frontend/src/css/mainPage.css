@@ -7,6 +7,11 @@ button, input, textarea, input[type="reset"] {
 	cursor: pointer;
 	outline: inherit;
 }
+.enableOverlay {
+    /* background-color:#000; */
+    opacity:0.5;
+    cursor: none;
+}
 .homePageTopBarLogo{
 
     width: 69px;
@@ -17,7 +22,10 @@ button, input, textarea, input[type="reset"] {
 .homePageTopBarName{
     font-size: 25px;
 }
-
+.Room-Container{
+    width: 100%;
+    height:100%;
+}
 .homePageSearchBar{
     background-color: #242c37;
     border-radius: 8px;
@@ -222,7 +230,26 @@ button, input, textarea, input[type="reset"] {
     color: white;
 }
 
+.modalAlreadyJoined{
+    background-color: #242c37;
+    color: white;
+}
 
+.modalAlreadyJoinedButton{
+    background-color: #fd4d4d;
+    border-radius: .5rem;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+
+
+}
+
+.afterLoad{
+    width: 100%;
+    height: 100%;
+}
 @media (max-width: 989px){
     .mainPageCreateRoomDivider{
         background-color: #151a21;
