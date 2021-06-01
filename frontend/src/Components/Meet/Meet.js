@@ -1,6 +1,5 @@
 import React,{useState,useEffect,useCallback} from 'react';
 import { useParams } from "react-router-dom";
-import queryString from 'query-string';
 import io from 'socket.io-client';
 import Quill from "quill"
 import "quill/dist/quill.snow.css"
@@ -138,6 +137,13 @@ const Meet = (props) => {
         });
         }
     }
+    const leaveMeet=(e)=>{
+        e.preventDefault();
+        socket.emit('leaveRoom',{host:props.user._id},(status)=>{
+            console.log(status)
+            window.location.href="http://localhost:3000/";
+        })
+    }
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
     
@@ -205,7 +211,7 @@ const Meet = (props) => {
             
             <div className='com-features-container'>
                 <button onClick={()=>setmicon(!micon)}>{micon?<img src={unmute} alt='video' width='40' height='40' />:<img src={mute} alt='video' width='40' height='40' />}</button>
-                <button><img src={endCall} alt='video' width='40' height='40' /></button>
+                <button onClick={leaveMeet}><img src={endCall} alt='video' width='40' height='40' /></button>
                 <button onClick={()=>setcamon(!camon)}>{camon?<img src={videoOn} alt='video' width='40' height='40' />:<img src={videoOff} alt='video' width='40' height='40' />}</button>
             </div>
         </div>

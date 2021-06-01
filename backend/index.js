@@ -157,11 +157,13 @@ io.on('connection',(socket)=>{
         try{
             //Get the details of user who emitted the event
             let user=await User.findById(arg.host);
-            let room=await Room.findById(user['room'])
+            let room=await Room.findById(user['room']);
+            // console.log(room['host'],arg.host);
             if(room!==undefined && room!==null){
                 //Delete the room if the host has ended the meeting
-                if(room['host']===mongoose.Types.ObjectId(arg.host)){
-                    console.log(room['host'],mongoose.Types.ObjecId(arg.host))
+                // console.log(room['host'],mongoose.Types.ObjecId(arg.host))
+                if(room['host']==(arg.host)){
+                    // console.log(room['host'],mongoose.Types.ObjecId(arg.host))
                     //Emit an end room event to all participants of the room 
                     // socket.to(room['roomId']).emit('endRoom')
                     await Room.findByIdAndDelete(room._id)
@@ -169,10 +171,11 @@ io.on('connection',(socket)=>{
                 //Remove the participant from the room
                 else{
                     room['participants'].splice(room['participants'].indexOf(user._id),1);
-                    console.log(room);
+                    // console.log(room);
                     await room.save();
                 }
                 //Remove the room from the user
+                io.to(user['room']).emit('message',{user:'admin',text:`${user.name}, has left`});
                 user['room']=undefined
                 await user.save()
                 redirect("Success",200)
@@ -246,7 +249,7 @@ io.on('connection',(socket)=>{
     socket.on('disconnect',()=>{
         const user= removeUser(socket.id);
         if(user){
-            io.to(user.room).emit('message',{user:'admin',text:`${user.name}, has left`});
+            // io.to(user.room).emit('message',{user:'admin',text:`${user.name}, has left`});
             io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
         }
     });

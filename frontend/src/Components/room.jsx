@@ -1,8 +1,5 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import serverEndpoint from '../config';
-import { io } from "socket.io-client";
-import { useHistory } from "react-router-dom";
 import topbar from 'topbar';
 import Meet from './Meet/Meet';
 
@@ -25,10 +22,9 @@ const Room=(props)=>{
           })
          setInterval(()=>{
              setLoading(false)
-         },10000) 
+         },5000) 
     }
 
-    //
     useEffect(()=>{
             loadTopBar()
     },[props])

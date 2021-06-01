@@ -13,7 +13,7 @@ const MainPage=(props)=>{
     let [prShowCreate,setprShowCreate]=useState(false);
     let [joinShow,setJoinShow]=useState(false);
     let [createShow,setCreateShow]=useState(false);
-    let [socket,setSocket]=useState(io(`${serverEndpoint}`))
+    let socket = io(`${serverEndpoint}`);
 
     let history=useHistory()
 
