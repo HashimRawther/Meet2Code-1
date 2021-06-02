@@ -55,7 +55,7 @@ const Board=(props)=> {
                 if(props.timeout!==undefined) clearTimeout(props.timeout);
                 props.settimeOut(setTimeout(function(){
                     var base64ImageData = canvas.toDataURL("image/png");
-                    props.socket.emit("canvas-data",base64ImageData);
+                    props.socket.emit("canvas-data",base64ImageData,props.room);
                 },100));
             };
         }

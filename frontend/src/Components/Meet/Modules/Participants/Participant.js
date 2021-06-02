@@ -2,9 +2,9 @@ import './participant.css';
 const Participant = ({users}) => {
     return (  
         <div className='participantArea'>
-            {users.map(({name}) => (
-                  <div key={name} className="participant">
-                    <p>{name}</p>
+            {users.map((user) => (
+                  <div key={user._id} className="participant">
+                    <p>{user.login}</p>
                   </div>
             ))}
         </div>

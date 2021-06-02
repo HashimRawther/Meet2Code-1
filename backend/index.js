@@ -162,6 +162,8 @@ io.on('connection',(socket)=>{
             if(room!==undefined && room!==null){
                 //Delete the room if the host has ended the meeting
                 // console.log(room['host'],mongoose.Types.ObjecId(arg.host))
+                io.to(room['roomId']).emit('message',{user:'',text:`${user['login']}, has left`});
+                io.to(room['roomId']).emit('userLeft', {user: user});
                 if(room['host']==(arg.host)){
                     // console.log(room['host'],mongoose.Types.ObjecId(arg.host))
                     //Emit an end room event to all participants of the room 
@@ -197,7 +199,7 @@ io.on('connection',(socket)=>{
     socket.on('join',async (arg,callback)=>{
         try{
             let room=arg.roomID;
-            let name=arg.name;
+            let name=arg.user.login;
             console.log(room);
             let userRoom=await Room.findOne({roomId: room}) //Get the room details
             if(userRoom===undefined || userRoom===null){    //Room doesn't exist
@@ -205,14 +207,14 @@ io.on('connection',(socket)=>{
                 console.log("cant read room");
                 return
             }
-            const {error,user}= addUser({id:socket.id,name,room});
-            if(error) return callback(error);
-            socket.join(user.room);
-            data=getData(user.room);
-            socket.emit('message',{user:'admin',text:`${user.name},welcome to the room ${userRoom['name']}`});
-            socket.broadcast.to(user.room).emit('message',{user:'admin',text:`${user.name}, has joined`});
-            io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
-            io.to(user.room).emit('canvas-data',data);
+            // const {error,user}= addUser({id:socket.id,name,room});
+            // if(error) return callback(error);
+            socket.join(room);
+            data=getData(room);
+            socket.emit('message',{user:'',text:`${name},welcome to the room ${userRoom['name']}`});
+            socket.broadcast.to(room).emit('message',{user:'admin',text:`${name}, has joined`});
+            io.to(room).emit('userJoined', { room: room, user: arg.user });
+            io.to(room).emit('canvas-data',data);
             callback(userRoom['name']);
         }
         catch(e)
@@ -220,16 +222,13 @@ io.on('connection',(socket)=>{
             console.log(e)
             redirect(undefined,404)
         }
-
     });
-    socket.on('canvas-data',(data)=>{
-        const user = getUser(socket.id);
-        setData(user.room,data);
-        io.to(user.room).emit('canvas-data',data);
+    socket.on('canvas-data',(data,room)=>{
+        setData(room,data);
+        io.to(room).emit('canvas-data',data);
     });
-    socket.on('sendMessage',(message,callback)=>{
-        const user = getUser(socket.id);
-        io.to(user.room).emit('message',{user:user.name,text:message});
+    socket.on('sendMessage',(message,name,room,callback)=>{
+        io.to(room).emit('message',{user:name,text:message});
         callback();
     })
     socket.on("get-document", async documentId => {
@@ -246,13 +245,6 @@ io.on('connection',(socket)=>{
             await Document.findByIdAndUpdate(documentId, { data })
         })
     })
-    socket.on('disconnect',()=>{
-        const user= removeUser(socket.id);
-        if(user){
-            // io.to(user.room).emit('message',{user:'admin',text:`${user.name}, has left`});
-            io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
-        }
-    });
 });
 
 

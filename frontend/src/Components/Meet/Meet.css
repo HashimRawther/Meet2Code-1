@@ -121,3 +121,8 @@
     grid-template-rows: repeat(10,minmax(10%,10%));
 
 }
+.resizeable {
+    resize: horizontal;
+    overflow: auto;
+    border: 2px solid black;
+  }

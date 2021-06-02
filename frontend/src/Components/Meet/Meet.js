@@ -62,14 +62,15 @@ const Meet = (props) => {
         setName(name)
         setRoom(roomID);
         console.log(roomID);
-        socket.emit('join',{name,roomID},(roomName)=>{
+        let user = props.user;
+        socket.emit('join',{roomID,user},(roomName)=>{
             setRoomName(roomName);
         });        
         return () =>{
             // socket.emit('disconnect');
             socket.off();
         }
-    },[ENDPOINT,roomID,props.user.login]);
+    },[ENDPOINT,roomID,props.user]);
     useEffect(() => {
         if (socket == null || quill == null) return
     
@@ -95,9 +96,13 @@ const Meet = (props) => {
         socket.on('message',(message)=>{
             setMessages([...messages,message]);
         })
-        socket.on("roomData", ({ users }) => {
-            setUsersInRoom(users);
+        socket.on("userJoined", ({ user }) => {
+            setUsersInRoom([...usersInRoom,user]);
         });
+        socket.on("userLeft",({user})=>{
+            console.log(user);
+            setUsersInRoom(usersInRoom.filter(item => item._id!==user._id))
+        })
         socket.on("canvas-data",function(data){
             var image= new Image();
             image.onload=function(){
@@ -116,7 +121,7 @@ const Meet = (props) => {
         return() => {
             socket.off("receive-changes", handler);
         }
-    },[messages,ctx,quill]);
+    },[messages,ctx,quill,usersInRoom]);
     useEffect(() => {
         if (socket == null || quill == null) return
     
@@ -133,7 +138,7 @@ const Meet = (props) => {
     const sendMessage=(e)=>{
         e.preventDefault();
         if(message){
-            socket.emit('sendMessage',message,()=>{setMessage('')
+            socket.emit('sendMessage',message,name,room,()=>{setMessage('')
         });
         }
     }
@@ -160,12 +165,12 @@ const Meet = (props) => {
       }, [])
     return (  
         <div className='meet'>
-            <div className='logo-container'>
+            <div className='logo-container resizeable'>
                 <img src={logo} alt='logo' width='70' height='66'/> 
                 <h1>{roomName}</h1>
             </div>
-            <div className='useroptions-container'></div>
-            <div className='communication-container'>
+            <div className='useroptions-container resizeable'></div>
+            <div className='communication-container resizeable'>
                 <div className="com-navbar">
                     <button onClick={()=>setCom(0)}><img src={video} alt='video' width='40' height='40' /></button>
                     <button onClick={()=>setCom(1)}><img src={chat} alt='chat' width='40' height='40' /></button>
@@ -184,7 +189,7 @@ const Meet = (props) => {
                     }
                 </div>
             </div>
-            <div className='workspace-container'>
+            <div className='workspace-container resizeable'>
                 <div className="work-choice-bar">
                     <button onClick={()=>setpage(0)}>1</button>
                     <button onClick={()=>setpage(1)}>2</button>
@@ -203,13 +208,13 @@ const Meet = (props) => {
                         ( 
                             page===1?
                             <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>
-                            :<div className="WhiteBoard"><Container image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
+                            :<div className="WhiteBoard"><Container room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
                         )
                     }
                 </div>
             </div> 
             
-            <div className='com-features-container'>
+            <div className='com-features-container resizeable'>
                 <button onClick={()=>setmicon(!micon)}>{micon?<img src={unmute} alt='video' width='40' height='40' />:<img src={mute} alt='video' width='40' height='40' />}</button>
                 <button onClick={leaveMeet}><img src={endCall} alt='video' width='40' height='40' /></button>
                 <button onClick={()=>setcamon(!camon)}>{camon?<img src={videoOn} alt='video' width='40' height='40' />:<img src={videoOff} alt='video' width='40' height='40' />}</button>
