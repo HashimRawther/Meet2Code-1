@@ -94,14 +94,20 @@ const Meet = (props) => {
       }, [quill])
     useEffect(()=>{
         socket.on('message',(message)=>{
+            console.log('message');
             setMessages([...messages,message]);
+        })
+        socket.on('UserList',(users)=>{
+            console.log(users);
+            setUsersInRoom(users);
         })
         socket.on("userJoined", ({ user }) => {
             setUsersInRoom([...usersInRoom,user]);
         });
         socket.on("userLeft",({user})=>{
             console.log(user);
-            setUsersInRoom(usersInRoom.filter(item => item._id!==user._id))
+            setUsersInRoom(usersInRoom.filter((itr)=>itr._id!==user._id))
+            console.log(usersInRoom);
         })
         socket.on("canvas-data",function(data){
             var image= new Image();
@@ -112,15 +118,14 @@ const Meet = (props) => {
             image.src = data;
             setImage(image);
         })
-        if (socket == null || quill == null) return
-
         const handler = delta => {
         quill.updateContents(delta)
         }
         socket.on("receive-changes", handler)
-        return() => {
+        return(() => {
             socket.off("receive-changes", handler);
-        }
+            socket.off();
+        })
     },[messages,ctx,quill,usersInRoom]);
     useEffect(() => {
         if (socket == null || quill == null) return

@@ -177,7 +177,7 @@ io.on('connection',(socket)=>{
                     await room.save();
                 }
                 //Remove the room from the user
-                io.to(user['room']).emit('message',{user:'admin',text:`${user.name}, has left`});
+                io.to(user['room']).emit('message',{user:'',text:`${user.name}, has left`});
                 user['room']=undefined
                 await user.save()
                 redirect("Success",200)
@@ -209,11 +209,13 @@ io.on('connection',(socket)=>{
             }
             // const {error,user}= addUser({id:socket.id,name,room});
             // if(error) return callback(error);
+            let userlist=await getParticipants(room);
             socket.join(room);
             data=getData(room);
             socket.emit('message',{user:'',text:`${name},welcome to the room ${userRoom['name']}`});
             socket.broadcast.to(room).emit('message',{user:'admin',text:`${name}, has joined`});
-            io.to(room).emit('userJoined', { room: room, user: arg.user });
+            socket.emit('UserList',userlist);
+            socket.broadcast.to(room).emit('userJoined', { room: room, user: arg.user });
             io.to(room).emit('canvas-data',data);
             callback(userRoom['name']);
         }
@@ -247,7 +249,28 @@ io.on('connection',(socket)=>{
     })
 });
 
-
+async function getParticipants(roomId){
+    try{
+        let room=await Room.findOne({roomId: roomId});
+        let users=[];
+        let user=await User.findById(room['host']);
+        users.push(user);
+        let participants = room['participants'];
+        let i;
+        for(i=0;i<participants.length;i++)
+        {
+            user=await User.findById(participants[i]);
+            users.push(user);
+        }
+        console.log(users);
+        return users;
+    }
+    catch(e)
+    {
+        console.log(e)
+        return [];
+    }
+}
 async function findOrCreateDocument(id) {
     if (id == null) return
   

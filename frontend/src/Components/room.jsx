@@ -22,7 +22,7 @@ const Room=(props)=>{
           })
          setInterval(()=>{
              setLoading(false)
-         },5000) 
+         },500) 
     }
 
     useEffect(()=>{

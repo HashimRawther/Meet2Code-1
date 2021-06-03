@@ -1,9 +1,10 @@
 import './participant.css';
 const Participant = ({users}) => {
+    console.log(users);
     return (  
         <div className='participantArea'>
-            {users.map((user) => (
-                  <div key={user._id} className="participant">
+            {users.map((user,id) => (
+                  <div key={id} className="participant">
                     <p>{user.login}</p>
                   </div>
             ))}
