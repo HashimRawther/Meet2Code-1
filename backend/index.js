@@ -147,7 +147,6 @@ io.on('connection',(socket)=>{
             console.log(e)
             redirect(undefined,404)
         }
-
     })
     socket.on('leaveRoom',async(arg,redirect)=>{
         try{
@@ -165,6 +164,7 @@ io.on('connection',(socket)=>{
                     //Emit an end room event to all participants of the room 
                     // socket.to(room['roomId']).emit('endRoom')
                     await Room.findByIdAndDelete(room._id)
+                    await Document.findByIdAndDelete(room['roomId'])
                 }
                 //Remove the participant from the room
                 else{
