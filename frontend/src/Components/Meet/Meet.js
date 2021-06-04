@@ -4,6 +4,8 @@ import io from 'socket.io-client';
 import Quill from "quill"
 import "quill/dist/quill.snow.css"
 import Chat from './Modules/Chat/Chat/Chat';
+import {jsPDF} from 'jspdf';
+// import {html2canvas} from 'html2canvas';
 import './styles.css';
 import './Meet.css';
 import Participant from './Modules/Participants/Participant';
@@ -154,25 +156,43 @@ const Meet = (props) => {
     }
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
-    
+
         wrapper.innerHTML = ""
         const editor = document.createElement("div")
         wrapper.append(editor)
         const q = new Quill(editor, {
-          theme: "snow",
-          modules: { toolbar: TOOLBAR_OPTIONS },
+            theme: "snow",
+            modules: { toolbar: TOOLBAR_OPTIONS },
         })
         q.disable()
         q.setText("Loading...")
         setQuill(q)
-      }, [])
+    }, [])
+
+    const savePDF=(e)=>{
+        e.preventDefault();
+
+        const input = document.querySelector('#root > div > div > div > div > div.workspace-container.resizeable > div.inner-workspace > div > div > div.ql-container.ql-snow > div.ql-editor').innerHTML;
+
+        var doc = new jsPDF('p', 'pt', 'a4');
+
+        doc.html(input, {
+        callback: function (doc) {
+            doc.save(roomName+".pdf");
+        },
+        x: 10,
+        y: 10
+        });
+    }
     return (  
         <div className='meet'>
             <div className='logo-container resizeable'>
                 <img src={logo} alt='logo' width='70' height='66'/> 
                 <h1>{roomName}</h1>
             </div>
-            <div className='useroptions-container resizeable'></div>
+            <div className='useroptions-container resizeable'>
+                <button onClick={savePDF}>Generate PDF</button>
+            </div>
             <div className='communication-container resizeable'>
                 <div className="com-navbar">
                     <button onClick={()=>setCom(0)}><img src={video} alt='video' width='40' height='40' /></button>
