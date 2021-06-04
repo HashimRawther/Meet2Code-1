@@ -2,10 +2,10 @@ import React from 'react';
 import './chat.css';
 import Input from '../Input/Input';
 import Messages from '../Messages/Messages';
-const Chat = ({messages,name,message,setMessage,sendMessage}) => {
+const Chat = ({id,messages,message,setMessage,sendMessage}) => {
     return ( 
             <div className='chat'>
-                <Messages messages={messages} name={name}/>
+                <Messages id={id} messages={messages}/>
                 <Input message={message} setMessage={setMessage} sendMessage={sendMessage}/>
             </div>
     );

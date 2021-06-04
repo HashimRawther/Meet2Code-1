@@ -1,10 +1,10 @@
 import './participant.css';
 const Participant = ({users}) => {
-    console.log(users);
     return (  
         <div className='participantArea'>
             {users.map((user,id) => (
                   <div key={id} className="participant">
+                    <img src={user.imageUrl} alt=""/>
                     <p>{user.login}</p>
                   </div>
             ))}

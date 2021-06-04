@@ -60,6 +60,7 @@ const Board=(props)=> {
             };
         }
         drawOnCanvas(canvas);
+        // eslint-disable-next-line
     },[])
     return (  
             <div className='sketch' id='sketch'>

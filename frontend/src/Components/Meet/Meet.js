@@ -61,7 +61,7 @@ const Meet = (props) => {
         let name = props.user.login;
         setName(name)
         setRoom(roomID);
-        console.log(roomID);
+        // console.log(roomID);
         let user = props.user;
         socket.emit('join',{roomID,user},(roomName)=>{
             setRoomName(roomName);
@@ -94,20 +94,17 @@ const Meet = (props) => {
       }, [quill])
     useEffect(()=>{
         socket.on('message',(message)=>{
-            console.log('message');
+            // console.log('message');
             setMessages([...messages,message]);
         })
         socket.on('UserList',(users)=>{
-            console.log(users);
             setUsersInRoom(users);
         })
         socket.on("userJoined", ({ user }) => {
             setUsersInRoom([...usersInRoom,user]);
         });
         socket.on("userLeft",({user})=>{
-            console.log(user);
             setUsersInRoom(usersInRoom.filter((itr)=>itr._id!==user._id))
-            console.log(usersInRoom);
         })
         socket.on("canvas-data",function(data){
             var image= new Image();
@@ -143,14 +140,15 @@ const Meet = (props) => {
     const sendMessage=(e)=>{
         e.preventDefault();
         if(message){
-            socket.emit('sendMessage',message,name,room,()=>{setMessage('')
+            let id= props.user._id;
+            socket.emit('sendMessage',message,id,name,room,()=>{setMessage('')
         });
         }
     }
     const leaveMeet=(e)=>{
         e.preventDefault();
         socket.emit('leaveRoom',{host:props.user._id},(status)=>{
-            console.log(status)
+            // console.log(status)
             window.location.href="http://localhost:3000/";
         })
     }
@@ -188,7 +186,7 @@ const Meet = (props) => {
                         ):
                         ( 
                             com===1?
-                            <div className="ChatArea"><Chat messages={messages} name={name} message={message} setMessage={setMessage} sendMessage={sendMessage}/></div>
+                            <div className="ChatArea"><Chat id={props.user._id} messages={messages} message={message} setMessage={setMessage} sendMessage={sendMessage}/></div>
                             :<div className="ParticipantsArea"><Participant users={usersInRoom}/></div>
                         )
                     }

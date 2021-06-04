@@ -51,7 +51,8 @@ router.get('/gitCallBack/getToken',async(req,res)=>{
         if(user===undefined || user===null){
             user=new User({
                 login:resp.login,
-                oauth:"git"
+                oauth:"git",
+                imageUrl:resp.avatar_url
             })
             await user.save()
         }
@@ -78,14 +79,13 @@ router.get('/gitCallBack',(req,res)=>{
 })
 
 router.post('/google',async(req,res)=>{
-  
-     
     let user=await User.findOne({login:req.body.user.login, oauth:"google"})
     // console.log(user)
     if(user===undefined || user===null){
         user=new User({
             login:req.body.user.login,
-            oauth:"google"
+            oauth:"google",
+            imageUrl:req.body.user.imageUrl
         })
         await user.save()
     }

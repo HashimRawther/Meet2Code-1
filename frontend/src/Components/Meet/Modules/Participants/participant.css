@@ -6,14 +6,21 @@
 }
 .participant{
     width:80%;
+    height:40px;
     overflow-wrap: break-word;
     margin:10%;
     background:  rgb(42, 161, 190);
     color:white;
     border-radius: 20px;
-
+    display: flex;
+    justify-content: left;
 }
 .participant p{
-    margin:20px;
-    padding: 5px;
+    padding-top:5px;
+    padding-left: 5px;
+}
+.participant img{
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
 }

@@ -1,4 +1,4 @@
-const {addUser,removeUser,getUser,getUsersInRoom, setData, getData} = require('./users');
+const {setData, getData} = require('./users');
 
 const express=require("express");
       app=express();
@@ -79,10 +79,6 @@ const io = socket(server,{cors: {
     }
 });
 
-const getClients=()=>{
-
-}
-
 const defaultValue = ""
 
 io.on('connection',(socket)=>{
@@ -94,7 +90,7 @@ io.on('connection',(socket)=>{
             let user=await User.findById(arg.host)
 
             if(user['room']!==undefined && user['room']!==null){       //Check if user is already in a room
-                console.log(401)
+                // console.log(401)
                 let room=await Room.findById(user['room'])
                 redirect(room.roomId,401)
                 return
@@ -110,7 +106,7 @@ io.on('connection',(socket)=>{
             user['room']=room._id
             user['socketId']=socket.id
             await user.save()
-            console.log(room);
+            // console.log(room);
             redirect(roomId,200);   //Created Successfully redirect with 200
         }
         catch(e){
@@ -190,7 +186,7 @@ io.on('connection',(socket)=>{
     })
 
     socket.on('test',arg=>{
-        console.log(socket.rooms)
+        // console.log(socket.rooms)
     })
     
     socket.on('closeConnection',arg=>{
@@ -200,7 +196,7 @@ io.on('connection',(socket)=>{
         try{
             let room=arg.roomID;
             let name=arg.user.login;
-            console.log(room);
+            // console.log(room);
             let userRoom=await Room.findOne({roomId: room}) //Get the room details
             if(userRoom===undefined || userRoom===null){    //Room doesn't exist
                 // redirect(undefined,404)
@@ -213,7 +209,7 @@ io.on('connection',(socket)=>{
             socket.join(room);
             data=getData(room);
             socket.emit('message',{user:'',text:`${name},welcome to the room ${userRoom['name']}`});
-            socket.broadcast.to(room).emit('message',{user:'admin',text:`${name}, has joined`});
+            socket.broadcast.to(room).emit('message',{user:'',text:`${name}, has joined`});
             socket.emit('UserList',userlist);
             socket.broadcast.to(room).emit('userJoined', { room: room, user: arg.user });
             io.to(room).emit('canvas-data',data);
@@ -229,8 +225,8 @@ io.on('connection',(socket)=>{
         setData(room,data);
         io.to(room).emit('canvas-data',data);
     });
-    socket.on('sendMessage',(message,name,room,callback)=>{
-        io.to(room).emit('message',{user:name,text:message});
+    socket.on('sendMessage',(message,id,name,room,callback)=>{
+        io.to(room).emit('message',{id:id,user:name,text:message});
         callback();
     })
     socket.on("get-document", async documentId => {
@@ -262,7 +258,7 @@ async function getParticipants(roomId){
             user=await User.findById(participants[i]);
             users.push(user);
         }
-        console.log(users);
+        // console.log(users);
         return users;
     }
     catch(e)
