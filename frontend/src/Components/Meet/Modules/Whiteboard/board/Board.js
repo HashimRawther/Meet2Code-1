@@ -7,8 +7,23 @@ const Board=(props)=> {
         props.ctx.lineWidth = props.size;
         if(props.image!==undefined && props.image.src!=="http://localhost:3000/null")
             props.ctx.drawImage(props.image,0,0);
-    },[props]);
-    
+    },[props.image,props.color,props.size,props.ctx]);
+    useEffect(()=>{
+        if(props.clear===1)
+        {
+            props.setClear(0);
+            let canvas = document.querySelector('#board');
+            props.ctx.clearRect(0,0,canvas.width,canvas.height);
+            props.socket.emit('clear',props.room);
+        }
+        else if(props.clear===2)
+        {
+            props.setClear(0);
+            let canvas = document.querySelector('#board');
+            props.ctx.clearRect(0,0,canvas.width,canvas.height);
+        }
+        // eslint-disable-next-line
+    },[props.clear]);
     useEffect(()=>{
         var canvas = document.querySelector('#board');
         const drawOnCanvas=(canvas)=>{
@@ -44,6 +59,8 @@ const Board=(props)=> {
     
             canvas.addEventListener('mouseup', function() {
                 canvas.removeEventListener('mousemove', onPaint, false);
+                var base64ImageData = canvas.toDataURL("image/png");
+                props.socket.emit("canvas-data",base64ImageData,props.room);
             }, false);
     
             var onPaint = function() {
@@ -52,11 +69,6 @@ const Board=(props)=> {
                 ctx.lineTo(mouse.x, mouse.y);
                 ctx.closePath();
                 ctx.stroke();
-                if(props.timeout!==undefined) clearTimeout(props.timeout);
-                props.settimeOut(setTimeout(function(){
-                    var base64ImageData = canvas.toDataURL("image/png");
-                    props.socket.emit("canvas-data",base64ImageData,props.room);
-                },100));
             };
         }
         drawOnCanvas(canvas);

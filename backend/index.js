@@ -192,6 +192,9 @@ io.on('connection',(socket)=>{
     socket.on('closeConnection',arg=>{
         socket.leave(`${arg.room}`)
     })
+    socket.on('clear',(roomID)=>{
+        socket.broadcast.to(roomID).emit('erase');
+    })
     socket.on('join',async (arg,callback)=>{
         try{
             let room=arg.roomID;

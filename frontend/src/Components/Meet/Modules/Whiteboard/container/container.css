@@ -8,6 +8,7 @@
 .color-picker-container{
     text-align:center;
     display:inline;
+
 }
 
 .brush-size-container{
@@ -17,6 +18,9 @@
 
 .tools-section{
     text-align:center;
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
 }
 
 .board-container{
@@ -25,4 +29,5 @@
     margin:auto;
     margin-top:1%;
     background:white;
+
 }

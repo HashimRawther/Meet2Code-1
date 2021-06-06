@@ -12,9 +12,25 @@
     margin-left: 10px;
     color:white;
 }
-.useroptions-container{
+.video-container{
     grid-column: span 3;
+    grid-row: span 2;
     background-color: #363434;
+}
+.user-options-container{
+    background-color: #363434;
+}
+.PDF{
+    color:white;
+    background-color: rgb(59, 221, 221);
+    margin: 20px;
+    padding: 5px;
+    border-radius: 20px;
+}
+.PDF:hover{
+    background-color: #363434;
+    border: rgb(59, 221, 221);
+    color:rgb(59, 221, 221);
 }
 .communication-container{   
     grid-row: span 9;
@@ -46,7 +62,7 @@
 .com-navbar{
     background-color: white;
     display: grid;
-    grid-template-columns: repeat(3,minmax(33%,auto));
+    grid-template-columns: repeat(2,minmax(50%,50%));
 }
 .com-navbar button{
     background-color: #363434;

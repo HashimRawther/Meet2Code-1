@@ -5,14 +5,13 @@ import Quill from "quill"
 import "quill/dist/quill.snow.css"
 import Chat from './Modules/Chat/Chat/Chat';
 import {jsPDF} from 'jspdf';
-// import {html2canvas} from 'html2canvas';
 import './styles.css';
 import './Meet.css';
 import Participant from './Modules/Participants/Participant';
 import Container from './Modules/Whiteboard/container/Container';
 import TextEditor from './Modules/DocEditor/TextEditor';
 import logo from '../../Images/logo.jpg';
-import video from '../../Images/video.png';
+// import video from '../../Images/video.png';
 import chat from '../../Images/chat.png';
 import user from '../../Images/user.png';
 import videoOn from '../../Images/videoOn.png';
@@ -38,7 +37,7 @@ const TOOLBAR_OPTIONS = [
 const Meet = (props) => {
     const { id: roomID } = useParams()
     const [page,setpage] = useState(0);
-    const [com,setCom] = useState(0);
+    const [com,setCom] = useState(1);
     const [name,setName] = useState('');
     const [room,setRoom] = useState('');
     const [messages,setMessages] = useState([]);
@@ -51,6 +50,7 @@ const Meet = (props) => {
     const [camon,setcamon] = useState(true);
     const [micon,setmicon] = useState(true);
     const [roomName,setRoomName] = useState();
+    const [clear,setClear] = useState(0);
     const ENDPOINT = 'http://localhost:9000';
     useEffect(()=>{
         var connectionOptions =  {
@@ -117,6 +117,10 @@ const Meet = (props) => {
             image.src = data;
             setImage(image);
         })
+        socket.on('erase',()=>{
+            setClear(2);
+        })
+        
         const handler = delta => {
         quill.updateContents(delta)
         }
@@ -190,20 +194,16 @@ const Meet = (props) => {
                 <img src={logo} alt='logo' width='70' height='66'/> 
                 <h1>{roomName}</h1>
             </div>
-            <div className='useroptions-container resizeable'>
-                <button onClick={savePDF}>Generate PDF</button>
+            <div className='video-container resizeable'>
+                
             </div>
             <div className='communication-container resizeable'>
                 <div className="com-navbar">
-                    <button onClick={()=>setCom(0)}><img src={video} alt='video' width='40' height='40' /></button>
                     <button onClick={()=>setCom(1)}><img src={chat} alt='chat' width='40' height='40' /></button>
                     <button onClick={()=>setCom(2)}><img src={user} alt='user' width='40' height='40' /></button>
                 </div>
                 <div className="com-overview">
                     {
-                        com === 0?(
-                            <div className='VideoArea'></div>
-                        ):
                         ( 
                             com===1?
                             <div className="ChatArea"><Chat id={props.user._id} messages={messages} message={message} setMessage={setMessage} sendMessage={sendMessage}/></div>
@@ -211,6 +211,10 @@ const Meet = (props) => {
                         )
                     }
                 </div>
+            </div>
+            <div className="user-options-container resizeable">
+                {page===1 && <button onClick={savePDF} className="PDF">Generate PDF</button>}
+                {page===2 && <button onClick={()=>setClear(1)} className="PDF">Clear</button>}
             </div>
             <div className='workspace-container resizeable'>
                 <div className="work-choice-bar">
@@ -231,7 +235,7 @@ const Meet = (props) => {
                         ( 
                             page===1?
                             <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>
-                            :<div className="WhiteBoard"><Container room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
+                            :<div className="WhiteBoard"><Container clear={clear} setClear={setClear} room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
                         )
                     }
                 </div>
