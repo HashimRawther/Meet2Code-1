@@ -7,6 +7,7 @@ import Chat from './Modules/Chat/Chat/Chat';
 import {jsPDF} from 'jspdf';
 import './styles.css';
 import './Meet.css';
+import VC from './Modules/VideoCall/vc-component'
 import Participant from './Modules/Participants/Participant';
 import Container from './Modules/Whiteboard/container/Container';
 import TextEditor from './Modules/DocEditor/TextEditor';
@@ -19,6 +20,8 @@ import videoOff from '../../Images/videoOff.png';
 import mute from '../../Images/mute.png';
 import unmute from '../../Images/unmute.png';
 import endCall from '../../Images/endCall.png';
+import PeerInit from './Modules/VideoCall/peer-init'
+import {toggleAudio, toggleVideo} from './Modules/VideoCall/vc'
 let socket;
 
 const SAVE_INTERVAL_MS = 2000
@@ -51,6 +54,8 @@ const Meet = (props) => {
     const [micon,setmicon] = useState(true);
     const [roomName,setRoomName] = useState();
     const [clear,setClear] = useState(0);
+    const [save,setSave] = useState(0);
+    const [myPeer] = useState(PeerInit())
     const ENDPOINT = 'http://localhost:9000';
     useEffect(()=>{
         var connectionOptions =  {
@@ -117,9 +122,9 @@ const Meet = (props) => {
             image.src = data;
             setImage(image);
         })
-        socket.on('erase',()=>{
-            setClear(2);
-        })
+        // socket.on('erase',()=>{
+        //     setClear(2);
+        // })
         
         const handler = delta => {
         quill.updateContents(delta)
@@ -195,7 +200,7 @@ const Meet = (props) => {
                 <h1>{roomName}</h1>
             </div>
             <div className='video-container resizeable'>
-                
+                <VC roomid ={roomID} uname={props.user.login} mypeer = {myPeer}/>
             </div>
             <div className='communication-container resizeable'>
                 <div className="com-navbar">
@@ -215,6 +220,7 @@ const Meet = (props) => {
             <div className="user-options-container resizeable">
                 {page===1 && <button onClick={savePDF} className="PDF">Generate PDF</button>}
                 {page===2 && <button onClick={()=>setClear(1)} className="PDF">Clear</button>}
+                {page===2 && <button onClick={()=>setSave(1)} className="PDF">Save</button>}
             </div>
             <div className='workspace-container resizeable'>
                 <div className="work-choice-bar">
@@ -235,16 +241,16 @@ const Meet = (props) => {
                         ( 
                             page===1?
                             <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>
-                            :<div className="WhiteBoard"><Container clear={clear} setClear={setClear} room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
+                            :<div className="WhiteBoard"><Container save={save} setSave={setSave} clear={clear} setClear={setClear} room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
                         )
                     }
                 </div>
             </div> 
             
             <div className='com-features-container resizeable'>
-                <button onClick={()=>setmicon(!micon)}>{micon?<img src={unmute} alt='video' width='40' height='40' />:<img src={mute} alt='video' width='40' height='40' />}</button>
+                <button onClick={()=>{setmicon(!micon);toggleAudio(myPeer)}}>{micon?<img src={unmute} alt='video' width='40' height='40' />:<img src={mute} alt='video' width='40' height='40' />}</button>
                 <button onClick={leaveMeet}><img src={endCall} alt='video' width='40' height='40' /></button>
-                <button onClick={()=>setcamon(!camon)}>{camon?<img src={videoOn} alt='video' width='40' height='40' />:<img src={videoOff} alt='video' width='40' height='40' />}</button>
+                <button onClick={()=>{setcamon(!camon);toggleVideo(myPeer)}}>{camon?<img src={videoOn} alt='video' width='40' height='40' />:<img src={videoOff} alt='video' width='40' height='40' />}</button>
             </div>
         </div>
     );

@@ -34,7 +34,7 @@ const Container = (props) => {
                 </div>
             </div>
             <div className='board-container'>
-                <Board clear={props.clear} setClear={props.setClear} room={props.room} color={color} size={size} image={props.image} socket={props.socket} ctx={props.ctx} setctx={props.setctx} timeout={props.timeout} settimeOut={props.settimeOut}/>
+                <Board save={props.save} setSave={props.setSave} clear={props.clear} setClear={props.setClear} room={props.room} color={color} size={size} image={props.image} socket={props.socket} ctx={props.ctx} setctx={props.setctx} timeout={props.timeout} settimeOut={props.settimeOut}/>
             </div>
         </div>
     );

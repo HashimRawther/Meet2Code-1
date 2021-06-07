@@ -14,16 +14,36 @@ const Board=(props)=> {
             props.setClear(0);
             let canvas = document.querySelector('#board');
             props.ctx.clearRect(0,0,canvas.width,canvas.height);
-            props.socket.emit('clear',props.room);
+            // props.socket.emit('clear',props.room);
+            props.ctx.fillStyle = "#ffffff";
+            props.ctx.fillRect(0, 0, canvas.width, canvas.height);
+            var base64ImageData = canvas.toDataURL("image/png");
+            props.socket.emit("canvas-data",base64ImageData,props.room);
         }
-        else if(props.clear===2)
-        {
-            props.setClear(0);
-            let canvas = document.querySelector('#board');
-            props.ctx.clearRect(0,0,canvas.width,canvas.height);
-        }
+        // else if(props.clear===2)
+        // {
+        //     props.setClear(0);
+        //     let canvas = document.querySelector('#board');
+        //     props.ctx.clearRect(0,0,canvas.width,canvas.height);
+        //     props.ctx.fillStyle = "#ffffff";
+        //     props.ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // }
         // eslint-disable-next-line
     },[props.clear]);
+    useEffect(()=>{
+        if(props.save===1)
+        {
+            let canvas = document.querySelector('#board');
+            var imageName = prompt('Please enter image name');
+            var canvasDataURL = canvas.toDataURL();
+            var a = document.createElement('a');
+            a.href = canvasDataURL;
+            a.download = imageName || 'drawing';
+            a.click();
+            props.setSave(0);
+        }
+        // eslint-disable-next-line
+    },[props.save])
     useEffect(()=>{
         var canvas = document.querySelector('#board');
         const drawOnCanvas=(canvas)=>{
@@ -33,7 +53,8 @@ const Board=(props)=> {
             var sketch_style = getComputedStyle(sketch);
             canvas.width = parseInt(sketch_style.getPropertyValue('width'));
             canvas.height = parseInt(sketch_style.getPropertyValue('height'));
-    
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             var mouse = {x: 0, y: 0};
             var last_mouse = {x: 0, y: 0};
     
