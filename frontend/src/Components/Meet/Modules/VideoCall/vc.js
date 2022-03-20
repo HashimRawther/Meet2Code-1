@@ -304,6 +304,7 @@ function toggleVideo(myPeer)
 function endcall()
 {
     socket.disconnect()
+    document.location.href='/'
 }
 
 export {

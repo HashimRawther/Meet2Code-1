@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+mongoose.set('useFindAndModify', false);
 mongoose.connect("mongodb+srv://sudharshan:neomaxborja@meet2code.o0mac.mongodb.net/Meet2Code?retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
