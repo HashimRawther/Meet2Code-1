@@ -22,6 +22,7 @@ import unmute from '../../Images/unmute.png';
 import endCall from '../../Images/endCall.png';
 import PeerInit from './Modules/VideoCall/peer-init'
 import {toggleAudio, toggleVideo} from './Modules/VideoCall/vc'
+import CodeEditor from './Modules/CodeEditor/CodeEditor'
 let socket;
 
 const SAVE_INTERVAL_MS = 2000
@@ -227,6 +228,7 @@ const Meet = (props) => {
                     <button onClick={()=>setpage(0)}>1</button>
                     <button onClick={()=>setpage(1)}>2</button>
                     <button onClick={()=>setpage(2)}>3</button>
+                    <button onClick={()=>setpage(3)}>SS</button>
                 </div>
                 
                 <div className="inner-workspace">
@@ -234,14 +236,23 @@ const Meet = (props) => {
                         page === 0?(
                             <div className='codeArea'>
                                 <div className='directory-container'></div>
-                                <div className='code-container'></div>
+                                <div className='code-container'><CodeEditor roomId={room}/></div>
                                 <div className='terminal-container'></div>
                             </div>
                         ):
                         ( 
-                            page===1?
-                            <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>
-                            :<div className="WhiteBoard"><Container save={save} setSave={setSave} clear={clear} setClear={setClear} room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
+                            page===1?(
+                                <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>)
+                            :
+                            (
+                                page===2?(
+                                    <div className="WhiteBoard"><Container save={save} setSave={setSave} clear={clear} setClear={setClear} room={room} image={image} socket={socket} ctx={ctx} setctx={setctx} timeout={timeout} settimeOut={settimeOut}/></div>
+                                )
+                                :
+                                (
+                                    <div></div>
+                                )
+                            )
                         )
                     }
                 </div>

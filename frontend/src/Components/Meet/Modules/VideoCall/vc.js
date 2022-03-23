@@ -124,7 +124,7 @@ function renderer(myPeer, ROOM_ID, username, audioEnable = true, videEnable = tr
 
     navigator.mediaDevices.getUserMedia({
     video: true,
-    audio: true
+    audio: true,
     }).then(stream => {
         localStream = stream
 
