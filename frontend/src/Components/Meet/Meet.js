@@ -219,9 +219,9 @@ const Meet = (props) => {
                 </div>
             </div>
             <div className="user-options-container resizeable">
-                {page===1 && <button onClick={savePDF} className="PDF">Generate PDF</button>}
-                {page===2 && <button onClick={()=>setClear(1)} className="PDF">Clear</button>}
-                {page===2 && <button onClick={()=>setSave(1)} className="PDF">Save</button>}
+                {page===1 && <button onClick={savePDF} className="click-button">Generate PDF</button>}
+                {page===2 && <button onClick={()=>setClear(1)} className="click-button">Clear</button>}
+                {page===2 && <button onClick={()=>setSave(1)} className="click-button">Save</button>}
             </div>
             <div className='workspace-container resizeable'>
                 <div className="work-choice-bar">

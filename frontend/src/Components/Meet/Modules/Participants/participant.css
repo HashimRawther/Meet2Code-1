@@ -1,8 +1,13 @@
 .participantArea{
     position: relative;
     width:100%;
-    height:100%;
+    height:89%;
     overflow: auto;
+}
+.participantContainer{
+    position: relative;
+    width:100%;
+    height:100%;
 }
 .participant{
     width:80%;
