@@ -9,6 +9,14 @@
     width:100%;
     height:100%;
 }
+.click-link{
+    color:white;
+    background-color: rgb(59, 221, 221);
+    margin: 20px;
+    padding: 5px;
+    border-radius: 20px;
+    text-decoration: none;
+}
 .participant{
     width:80%;
     height:40px;
