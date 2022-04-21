@@ -230,7 +230,7 @@ const Meet = (props) => {
                     <button onClick={()=>setpage(2)}>3</button>
                     <button onClick={()=>setpage(3)}>SS</button>
                 </div>
-                
+
                 <div className="inner-workspace">
                     {
                         page === 0?(
@@ -240,7 +240,7 @@ const Meet = (props) => {
                                 <div className='terminal-container'></div>
                             </div>
                         ):
-                        ( 
+                        (
                             page===1?(
                                 <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>)
                             :

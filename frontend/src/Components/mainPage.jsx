@@ -200,7 +200,7 @@ const MainPage=(props)=>{
                                     <h5 className="modal-title modalAlreadyJoined" id="locModalLabel">You've already joined a room.</h5>
                                 </div>
                                 <div className="modal-body modalAlreadyJoined" style={{border:"none"}}>
-                                    <div className="d-flex flex-row justify-content-between"> 
+                                    <div className="d-flex flex-row justify-content-between">
                                         <button className="col-5  modalAlreadyJoinedButton" id="reJoinRoom">Re-Join</button>
                                         <button className="col-5  modalAlreadyJoinedButton" id="leaveJoinedRoom">Leave</button>
                                     </div>
@@ -218,7 +218,7 @@ const MainPage=(props)=>{
     return (
         <React.Fragment>
         {modalDisplay()}
-        <div  id="mainPageWrapper">
+        <div  id="mainPageWrapper" className='container-lg'>
         <div>
             <div className="container-lg homePageTopBar mt-2 d-flex flex-sm-row align-items-center justify-content-center-sm justify-content-end" >
 
@@ -243,7 +243,7 @@ const MainPage=(props)=>{
 
 
                 <div className="col-sm-3 col-1 container-lg justify-content-center profileDropdown" style={{textAlign:"center", cursor:"pointer"}}>
-                    
+
                     <div className="profileDropdown"  onClick={()=>{toggleDropDown()}}>
                         <img src={`${props.user.imageUrl}`} className="homePageUserDP " alt="" ></img>
                         <div className="profileDropdown-content mt-2" id="profileDropdown-content">
