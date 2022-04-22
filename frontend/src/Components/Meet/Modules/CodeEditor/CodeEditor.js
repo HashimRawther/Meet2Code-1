@@ -28,6 +28,7 @@ import {
 
 
 const monacoThemeList = ["vs", "vs-dark", "hc-black"]
+let editor
 
 const CodeEditor=(props)=>{
 
@@ -58,7 +59,7 @@ const CodeEditor=(props)=>{
     console.log(provider)
     const type = ydocument.getText('monaco')
 
-    const editor = monaco.editor.create(document.getElementById('monaco-editor' ), {
+    editor = monaco.editor.create(document.getElementById('monaco-editor' ), {
       value: '', // MonacoBinding overwrites this value with the content of type
       language: tabs[currentTab]['language'],
       theme : tabs[currentTab]['theme'],
@@ -196,4 +197,16 @@ const CodeEditor=(props)=>{
 
 }
 
+const returnData = () => {
+  if(editor)
+  {
+    return editor.getValue()
+  }
+  else
+  {
+    return ""
+  }
+}
+
+export {returnData}
 export default CodeEditor;
