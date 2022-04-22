@@ -37,12 +37,12 @@ const CodeEditor=(props)=>{
       {
         'theme' : 'vs-dark',
         'language' : 'javascript',
-        'questionId' : -1,
+        'question' : undefined
       },
       {
         'theme' : 'vs-dark',
         'language' : 'javascript',
-        'questionId' : -1,
+        'question' : undefined
       }
   ])
 
@@ -94,11 +94,9 @@ const CodeEditor=(props)=>{
 
       let api_fetch = async () => {
 
-        let questions = await fetch(serverEndpoint + '/codeforces/questions?tag=' + tag);
+        let questions = await fetch(serverEndpoint + '/codeforces/questions?tags=' + tag);
         questions = await questions.json()
-        console.log(questions);
-
-        setModalQuestions(questions);
+        setModalQuestions(questions['questions']['result']['problems']);
       }
 
       api_fetch()
@@ -111,7 +109,7 @@ const CodeEditor=(props)=>{
   }
 
   let closeTab=(tabId)=>{
-    
+
       let curLen = tabLen, curList = [...tabs]
       curList.splice(curList.indexOf(tabId),1)
 
@@ -148,10 +146,19 @@ const CodeEditor=(props)=>{
       }
     }
 
-
     let tabsCopy = [...tabs]
     tabsCopy[currentTab] = newObj
     setTabs(tabsCopy)
+  }
+
+  let setQuestion = (question) => {
+
+    let curTabs = [...tabs]
+    curTabs[currentTab]['question'] = question
+    setTabs(curTabs)
+
+    console.log(question)
+    props.setQuestDiv(question)
 
   }
 
@@ -184,10 +191,10 @@ const CodeEditor=(props)=>{
           <div className='row container justify-content-between' style={{width:"100%", height:"30px", color:"black"}}>
               <div className='col-4' style={{textAlign:"left"}}>
                 <div className='dropdown' >
-                  <button class="btn btn-secondary dropdown-toggle" style={{maxWidth:"100%", maxHeight:"50%", height:"25px", fontSize:"15px"}} type="button" id="languageSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button className="btn btn-secondary dropdown-toggle" style={{maxWidth:"100%", maxHeight:"50%", height:"25px", fontSize:"15px"}} type="button" id="languageSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Language
                   </button>
-                  <div class="dropdown-menu" aria-labelledby="languageSelect">
+                  <div className="dropdown-menu" aria-labelledby="languageSelect">
                     <div className="dropdown-item" onClick={()=>changeEditor("javascript", undefined)}>Javascript</div>
                     <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
                     <div className="dropdown-item" onClick={()=>changeEditor("c", undefined)}>C</div>
@@ -199,26 +206,35 @@ const CodeEditor=(props)=>{
                   <button className='btn-primary' data-toggle="modal" data-target="#exampleModal">
                     Choose a question
                   </button>
-                  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                           Select a question 
+                  <div className="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                           Select a question
                         </div>
-                        <div class="modal-body">
+                        <div className="modal-body">
                           <div className='dropdown'>
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="cat-select" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button className="btn btn-secondary dropdown-toggle" type="button" id="cat-select" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                               Category
                             </button>
-                            <div class="dropdown-menu" aria-labelledby="cat-select">
+                            <div className="dropdown-menu" aria-labelledby="cat-select">
                               <div className="dropdown-item" onClick={ () => setTag('2-sat')}>2-sat</div>
                               <div className="dropdown-item" onClick={ () => setTag('fft')}>fft</div>
                               <div className="dropdown-item" onClick={ () => setTag('implementation')}>implementation</div>
                             </div>
                           </div>
 
-                          <div>
+                          <div className='mt-2'>
+                            <ul>
+                            { modalQuestions.map(question => {
+                                return <li style={{ "cursor" : "pointer" }} onClick = { () => {setQuestion(question) } } >
+                                          { question['name'] } : { question['rating']}
+                                      </li>
 
+                            }) }
+                            </ul>
+                          </div>
+                          <div>
                           </div>
                         </div>
                     </div>
@@ -228,10 +244,10 @@ const CodeEditor=(props)=>{
 
               <div className='col-4' style={{textAlign:"right"}}>
                 <div className='dropdown'>
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="themeSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button className="btn btn-secondary dropdown-toggle" type="button" id="themeSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Theme
                   </button>
-                  <div class="dropdown-menu" aria-labelledby="themeSelect">
+                  <div className="dropdown-menu" aria-labelledby="themeSelect">
                     <div className="dropdown-item" onClick={()=>changeEditor(undefined, "vs-dark")}>vs-dark</div>
                     <div className="dropdown-item" onClick={()=>changeEditor(undefined, "vs")}>vs</div>
                     <div className="dropdown-item" onClick={()=>changeEditor(undefined, "hc-black")}>hc-black</div>

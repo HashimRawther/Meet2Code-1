@@ -44,7 +44,7 @@
     grid-row:span 9;
     background-color: #a0a0a0;
     display:grid;
-    grid-template-columns: repeat(25,minmax(4%,4%));
+    grid-template-columns: repeat(50,minmax(2%,2%));
 }
 .com-features-container{
     background-color: #363434;
@@ -78,25 +78,29 @@
     display:grid;
 }
 .inner-workspace{
-    grid-column: span 24;
+    grid-column: span 49;
     background-color: #412d2d;
     display:grid;
     
 }
 .directory-container{
     grid-row: span 3;
+    grid-column: span 3;
     background-color: #558f62;
+    overflow-y: auto;
+    height: 100%;
 }
 .code-container{
-    grid-column: span 4;
+    grid-column: span 7;
     grid-row: span 2;
     background-color: #8f8e55;
 }
 .terminal-container{
-    grid-column:span 4;
+    grid-column:span 7;
     background-color: #8f5555;
 }
 .work-choice-bar{
+    grid-column: span 1;
     background-color: aqua;
     display: grid;
 }
@@ -106,8 +110,8 @@
 .codeArea{
     background-color: rgb(92, 79, 75);
     display:grid;
-    grid-template-rows: repeat(3,minmax(33%,auto));
-    grid-template-columns: repeat(5,minmax(20%,20%));
+    grid-template-rows: repeat(3,minmax(33%,33%));
+    grid-template-columns: repeat(10,minmax(10%,10%));
 }
 .WhiteBoard{
     background-color:rgb(156, 76, 51);
