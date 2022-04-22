@@ -23,6 +23,7 @@ import endCall from '../../Images/endCall.png';
 import PeerInit from './Modules/VideoCall/peer-init'
 import {toggleAudio, toggleVideo} from './Modules/VideoCall/vc'
 import CodeEditor from './Modules/CodeEditor/CodeEditor'
+import CodeExecutor from './Modules/CodeExecutor/CodeExecutor';
 let socket;
 
 const SAVE_INTERVAL_MS = 2000
@@ -237,7 +238,7 @@ const Meet = (props) => {
                             <div className='codeArea'>
                                 <div className='directory-container'></div>
                                 <div className='code-container'><CodeEditor roomId={room}/></div>
-                                <div className='terminal-container'></div>
+                                <div className='terminal-container'><CodeExecutor></CodeExecutor></div>
                             </div>
                         ):
                         ( 

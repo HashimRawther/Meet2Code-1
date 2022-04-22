@@ -96,6 +96,21 @@
     grid-column:span 4;
     background-color: #8f5555;
 }
+.code-executor{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 38px;
+}
+.user-custom-input{
+    /* width: 300px; */
+}
+#user-input{
+    background-color: aqua;
+}
+#code-output{
+    background-color: azure;
+}
 .work-choice-bar{
     background-color: aqua;
     display: grid;
