@@ -11,7 +11,7 @@ import VC from './Modules/VideoCall/vc-component'
 import Participant from './Modules/Participants/Participant';
 import Container from './Modules/Whiteboard/container/Container';
 import TextEditor from './Modules/DocEditor/TextEditor';
-import logo from '../../Images/logo.jpg';
+import logo from '../../Images/SSN.png';
 // import video from '../../Images/video.png';
 import chat from '../../Images/chat.png';
 import user from '../../Images/user.png';
@@ -197,7 +197,7 @@ const Meet = (props) => {
     return (  
         <div className='meet'>
             <div className='logo-container resizeable'>
-                <img src={logo} alt='logo' width='70' height='66'/> 
+                <img src={logo} alt='logo' width='70' height='60'/> 
                 <h1>{roomName}</h1>
             </div>
             <div className='video-container resizeable'>

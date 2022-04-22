@@ -3,8 +3,8 @@
     display: flex;
 }
 .logo-container img{
-    border-radius: 100px;
-    margin-top: 3px;
+    border-radius: 10px;
+    margin-top: 5px;
     margin-left:10px;
 }
 .logo-container h1{
