@@ -90,9 +90,9 @@ button, input, textarea, input[type="reset"] {
     font-weight: 200;
     padding-top: 8px;
    padding: 12px;
-   
+
    border-radius: 0px 0px 8px 8px;
-} 
+}
 
 .profileDropdown-content-list{
     padding-top:10px;
@@ -309,3 +309,31 @@ button, input, textarea, input[type="reset"] {
         zoom: 0.8;
     }
   }
+
+.modal {
+    text-align: center;
+  }
+
+@media screen and (min-width: 768px) {
+    .modal:before {
+      display: inline-block;
+      vertical-align: middle;
+      content: " ";
+      height: 100%;
+    }
+  }
+
+  .modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+/* Important part */
+.modal-dialog{
+    overflow-y: initial !important
+}
+.modal-body{
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}

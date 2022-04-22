@@ -9,6 +9,7 @@ import { WebsocketProvider } from 'y-websocket'
 import { MonacoBinding } from 'y-monaco'
 import * as monaco from 'monaco-editor'
 // import * as monaco from 'monaco-editor/esm/vs/editor/editor.api'
+import serverEndpoint from '../../../../config'
 
 import {
   BrowserRouter as Router,
@@ -36,16 +37,21 @@ const CodeEditor=(props)=>{
 
       {
         'theme' : 'vs-dark',
-        'language' : 'javascript'
+        'language' : 'javascript',
+        'question' : undefined
       },
       {
         'theme' : 'vs-dark',
-        'language' : 'javascript'
+        'language' : 'javascript',
+        'question' : undefined
       }
   ])
 
   let [tabLen, setTablen] = useState(4)
   let [currentTab, setCurrentTab] = useState(0)
+  let [tag, setTag] = useState('2-sat')
+  let [modalQuestions, setModalQuestions] = useState([])
+
 
   useEffect(()=>{
 
@@ -85,13 +91,26 @@ const CodeEditor=(props)=>{
 
   },[props.roomId, currentTab, tabs])
 
+  useEffect(()=>{
+
+      let api_fetch = async () => {
+
+        let questions = await fetch(serverEndpoint + '/codeforces/questions?tags=' + tag);
+        questions = await questions.json()
+        setModalQuestions(questions['questions']['result']['problems']);
+      }
+
+      api_fetch()
+
+  },[tag]);
+
   //Change the current tab to point to tabId
   let changeTab=(tabId)=>{
     setCurrentTab(tabId)
   }
 
   let closeTab=(tabId)=>{
-    
+
       let curLen = tabLen, curList = [...tabs]
       curList.splice(curList.indexOf(tabId),1)
 
@@ -128,10 +147,19 @@ const CodeEditor=(props)=>{
       }
     }
 
-
     let tabsCopy = [...tabs]
     tabsCopy[currentTab] = newObj
     setTabs(tabsCopy)
+  }
+
+  let setQuestion = (question) => {
+
+    let curTabs = [...tabs]
+    curTabs[currentTab]['question'] = question
+    setTabs(curTabs)
+
+    console.log(question)
+    props.setQuestDiv(question)
 
   }
 
@@ -162,30 +190,72 @@ const CodeEditor=(props)=>{
             }
           </div>
           <div className='row container justify-content-between' style={{width:"100%", height:"30px", color:"black"}}>
-              <div className='col-6' style={{textAlign:"left"}}>
+              <div className='col-4' style={{textAlign:"left"}}>
                 <div className='dropdown' >
-                  <button class="btn btn-secondary dropdown-toggle" style={{maxWidth:"100%", maxHeight:"50%", height:"25px", fontSize:"15px"}} type="button" id="languageSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button className="btn btn-secondary dropdown-toggle" style={{maxWidth:"100%", maxHeight:"50%", height:"25px", fontSize:"15px"}} type="button" id="languageSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Language
                   </button>
-                  <div class="dropdown-menu" aria-labelledby="languageSelect">
-                  <div className="dropdown-item" onClick={()=>changeEditor("javascript", undefined)}>Javascript</div>
-                  <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
-                  <div className="dropdown-item" onClick={()=>changeEditor("c", undefined)}>C</div>
+                  <div className="dropdown-menu" aria-labelledby="languageSelect">
+                    <div className="dropdown-item" onClick={()=>changeEditor("javascript", undefined)}>Javascript</div>
+                    <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
+                    <div className="dropdown-item" onClick={()=>changeEditor("c", undefined)}>C</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className='col-6' style={{textAlign:"right"}}>
-              <div className='dropdown'>
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="themeSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Theme
-                </button>
-                <div class="dropdown-menu" aria-labelledby="themeSelect">
-                  <div className="dropdown-item" onClick={()=>changeEditor(undefined, "vs-dark")}>vs-dark</div>
-                  <div className="dropdown-item" onClick={()=>changeEditor(undefined, "vs")}>vs</div>
-                  <div className="dropdown-item" onClick={()=>changeEditor(undefined, "hc-black")}>hc-black</div>
+
+              <div className='col-4' style={{textAlign:"center"}}>
+                  <button className='btn-primary' data-toggle="modal" data-target="#exampleModal">
+                    Choose a question
+                  </button>
+                  <div className="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                           Select a question
+                        </div>
+                        <div className="modal-body">
+                          <div className='dropdown'>
+                            <button className="btn btn-secondary dropdown-toggle" type="button" id="cat-select" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              Category
+                            </button>
+                            <div className="dropdown-menu" aria-labelledby="cat-select">
+                              <div className="dropdown-item" onClick={ () => setTag('2-sat')}>2-sat</div>
+                              <div className="dropdown-item" onClick={ () => setTag('fft')}>fft</div>
+                              <div className="dropdown-item" onClick={ () => setTag('implementation')}>implementation</div>
+                            </div>
+                          </div>
+
+                          <div className='mt-2'>
+                            <ul>
+                            { modalQuestions.map(question => {
+                                return <li style={{ "cursor" : "pointer" }} onClick = { () => {setQuestion(question) } } >
+                                          { question['name'] } : { question['rating']}
+                                      </li>
+
+                            }) }
+                            </ul>
+                          </div>
+                          <div>
+                          </div>
+                        </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+
+              <div className='col-4' style={{textAlign:"right"}}>
+                <div className='dropdown'>
+                  <button className="btn btn-secondary dropdown-toggle" type="button" id="themeSelect" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Theme
+                  </button>
+                  <div className="dropdown-menu" aria-labelledby="themeSelect">
+                    <div className="dropdown-item" onClick={()=>changeEditor(undefined, "vs-dark")}>vs-dark</div>
+                    <div className="dropdown-item" onClick={()=>changeEditor(undefined, "vs")}>vs</div>
+                    <div className="dropdown-item" onClick={()=>changeEditor(undefined, "hc-black")}>hc-black</div>
+                  </div>
+                </div>
+              </div>
+
           </div>
         </div>
         <div id="monaco-editor" className="row  " style={{width:"100%", height:"100%"}}>

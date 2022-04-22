@@ -23,6 +23,7 @@ import endCall from '../../Images/endCall.png';
 import PeerInit from './Modules/VideoCall/peer-init'
 import {toggleAudio, toggleVideo} from './Modules/VideoCall/vc'
 import CodeEditor from './Modules/CodeEditor/CodeEditor'
+import serverEndPoint  from '../../config';
 import CodeExecutor from './Modules/CodeExecutor/CodeExecutor';
 let socket;
 
@@ -59,6 +60,9 @@ const Meet = (props) => {
     const [save,setSave] = useState(0);
     const [myPeer] = useState(PeerInit())
     const ENDPOINT = 'http://localhost:9000';
+    let   [question, setQuestion] = useState(undefined)
+    let   [questionText, setQuestionText] = useState("")
+
     useEffect(()=>{
         var connectionOptions =  {
             "force new connection" : true,
@@ -178,7 +182,22 @@ const Meet = (props) => {
         q.disable()
         q.setText("Loading...")
         setQuill(q)
-    }, [])
+    }, []);
+
+
+    useEffect(() => {
+        
+        let api_fetch = async () => {
+
+            let resp = await fetch(serverEndPoint + '/getProblem?contest=' +  question['contestId'] + '&id=' + question['index']);
+            resp = await resp.text();
+            setQuestionText(resp)
+        }
+        
+        if(question !== undefined)
+            api_fetch()
+
+    }, [question])
 
     const savePDF=(e)=>{
         e.preventDefault();
@@ -195,6 +214,11 @@ const Meet = (props) => {
         y: 10
         });
     }
+
+    let setQuestionDiv = (question) => {
+        setQuestion(question);
+    }
+
     return (  
         <div className='meet'>
             <div className='logo-container resizeable'>
@@ -231,17 +255,28 @@ const Meet = (props) => {
                     <button onClick={()=>setpage(2)}>3</button>
                     <button onClick={()=>setpage(3)}>SS</button>
                 </div>
-                
+
                 <div className="inner-workspace">
                     {
                         page === 0?(
                             <div className='codeArea'>
+                                <div className='directory-container'>
+                                    { questionText !== "" ?
+                                      <div>
+                                           { questionText } 
+                                      </div> :
+                                      ""
+                                     }
+                                </div>
+                                <div className='code-container'><CodeEditor roomId={room}  setQuestDiv={setQuestionDiv} /></div>
+                                <div className='terminal-container'></div>
+
                                 <div className='directory-container'></div>
                                 <div className='code-container'><CodeEditor roomId={room}/></div>
                                 <div className='terminal-container'><CodeExecutor></CodeExecutor></div>
                             </div>
                         ):
-                        ( 
+                        (
                             page===1?(
                                 <div className="DocEditing"><TextEditor wrapperRef={wrapperRef}/></div>)
                             :

@@ -14,6 +14,7 @@ const mongoose = require("mongoose");
 const Room=require('./Schemas/room');
 const User=require('./Schemas/user');
 const { v4: uuid } = require('uuid');
+const cheerio = require("cheerio");
 
 const Document = require("./Schemas/Document")
 const Peer = require('./Schemas/peerinfos')
@@ -341,6 +342,50 @@ app.set('socketio',io)
 
 app.use('/oauth',oauth);
 app.use('/room',room);
+
+app.get('/getProblem/', async(req, res)=>{
+
+    let {contest, id} = req.query
+    try{
+
+        console.log(contest, id)
+        let response = await fetch("https://www.codeforces.com/problemset/problem/"+contest+"/"+id);
+        response = await response.text();
+
+        let doc = cheerio.load(response);
+        let htmlResponse = doc('.problem-statement').text();
+        console.log(htmlResponse);
+
+        res.send(htmlResponse);
+    }
+    catch(exception)
+    {
+        console.log(exception)
+        res.json({contest, id})
+    }
+
+})
+
+app.get('/codeforces/questions', async(req,res)=>{
+
+    let {tags} = req.query
+    if(tags === undefined)
+        tags = "2-sat"
+
+    try{
+        let response = await fetch("https://codeforces.com/api/problemset.problems?tags="+tags, {
+            method : "get"
+        });
+        response = await response.json();
+        res.json({questions : response})
+    }
+    catch(exception)
+    {
+        console.log("Exception", exception)
+        res.json({"msg" : "Questions not found"})
+    }
+})
+
 server.listen(PORT,()=>{
     console.log('Server started on port: ',PORT);
 });
