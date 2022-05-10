@@ -1,0 +1,86 @@
+
+.App-container{
+    display: grid;
+    grid-template-columns: repeat(4,auto);
+    grid-template-rows: repeat(10,auto); 
+    height: -moz-calc(100% - 2em);
+    height: -webkit-calc(100% - 2em);
+    height: calc(100% - 2em);
+    width: -webkit-calc(100%-2em);
+    width: -moz-calc(100%-2em);
+    width: calc(100%-2em);
+    padding: 1em;
+    transition: 1s;
+}
+.title-space{
+    position:absolute;
+    opacity: 0;
+    background-color: gray;
+    width:100%;
+    height:3%;
+    top:0;
+    transition: 1s;
+}
+.utilities{
+    position:absolute;
+    opacity: 0;
+    background-color: gray;
+    width:100%;
+    height:3%;
+    bottom:0;
+    transition: 1s;
+}
+
+.tab-switch{
+    position:absolute;
+    opacity: 0;
+    background-color: gray;
+    width:1%;
+    height:100%;
+    left:0;
+    transition: 1s;
+}
+
+.comm-switch{
+    position:absolute;
+    opacity: 0;
+    background-color: gray;
+    width:2%;
+    height:100%;
+    right:0;
+    transition: 1s;
+}
+
+.App > .title-space, .App > .utilities, .App > .tab-switch, .App > .comm-switch{
+    pointer-events: auto;
+}
+/* 
+.App:hover > .App-container{
+    padding: 5em;
+    height: -moz-calc(100% - 10em);
+    height: -webkit-calc(100% - 10em);
+    height: calc(100% - 10em);
+    width: -webkit-calc(100% - 10em);
+    width: -moz-calc(100% - 10em);
+    width: calc(100% - 10em);
+} */
+
+.App:hover > .title-space, .App:hover > .utilities {
+    opacity: 100;
+    height: 8%;
+}
+
+.App:hover > .tab-switch, .App:hover > .comm-switch{
+    opacity: 100;
+    width: 4%;
+}
+
+#title-space:focus{
+    opacity: 100;
+}
+
+#inp:focus{
+    background-color: aqua;
+}
+
+
