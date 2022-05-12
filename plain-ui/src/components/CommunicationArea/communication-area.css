@@ -1,9 +1,16 @@
 .communication-area{
+    position:relative;
     background-color: #cae;
     margin-left:1em;
     border-radius: 1em;
     grid-row:1/11;
-
 }
 
 
+
+.expand-btn-area{
+    position:absolute;
+    top:50%;
+    left:0;
+    transition: 1s;
+}

@@ -1,3 +1,9 @@
 .comm-switch-box{
     background-color: blanchedalmond;
+    display: block;
+}
+
+#chat-icon{
+    height: 3em;
+    width: 3em;
 }

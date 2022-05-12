@@ -1,6 +1,9 @@
 .chat-area{
     background-color: #ace;
-    margin:1em;
     border-radius: 1em;
-    grid-row: 1/5;
+    height: 100%;
+    width: 100%;
+}
+.close-chat-btn{
+    position:absolute;
 }
