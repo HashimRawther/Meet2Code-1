@@ -147,8 +147,11 @@ io.on('connection',(socket)=>{
             if(user['room']!==undefined && user['room']!==null){       //Check if user is already in a room
                 // console.log(401)
                 let room=await Room.findById(user['room'])
-                redirect(room.roomId,401)
-                return
+                if(room !== null && room !== undefined)
+                {
+                    redirect(room.roomId,401)
+                    return
+                }
             }
             //Create room with the arguments sent along with the newly created roomId
             let room=new Room({
@@ -172,6 +175,7 @@ io.on('connection',(socket)=>{
     socket.on('joinRoom',async(arg,redirect)=>{
         try{
             let room=await Room.findOne({roomId: arg.id}) //Get the room details
+            console.log(room, arg.id);
             if(room===undefined || room===null){    //Room doesn't exist
                 redirect(undefined,404)
                 return
@@ -179,7 +183,7 @@ io.on('connection',(socket)=>{
             //Get the details of user who emitted the event
             let user=await User.findById(arg.participant)
 
-            if(user['room']!==undefined && user['room']!==null && user['room']!==room._id){       //Check if user is already in a room and not in the given room
+            if(user['room']!==undefined && user['room']!==null && String(user['room']) !== String(room._id)){       //Check if user is already in a room and not in the given room
                 redirect(room.roomId,401)
                 return
             }
@@ -187,7 +191,7 @@ io.on('connection',(socket)=>{
                 redirect(undefined, 403);    
                 return;           
             }
-            if(user['room']!=room._id){                         //If the user doesn't already exist
+            if(String(user['room'])!== String(room._id)){                         //If the user doesn't already exist
 
                 room['participants'].push(user._id);
                 user['room']=room._id
@@ -207,6 +211,14 @@ io.on('connection',(socket)=>{
             //Get the details of user who emitted the event
             let user=await User.findById(arg.host);
             let room=await Room.findById(user['room']);
+            // console.log(room['host'],arg.host);
+            if(room === undefined || room === null)
+            {
+                user['room'] = null;
+                await user.save();
+                redirect("Success",200)
+            }
+
             if(room!==undefined && room!==null){
                 //Delete the room if the host has ended the meeting
                 io.to(room['roomId']).emit('message',{user:'',text:`${user['login']}, has left`});
@@ -367,6 +379,34 @@ app.get('/codeforces/questions', async(req,res)=>{
         console.log("Exception", exception)
         res.json({"msg" : "Questions not found"})
     }
+});
+
+app.get('/publicRooms', async(req,res) => {
+
+    const rooms = await Room.find().populate('host').populate('participants');
+    let response = []
+    for(let room of rooms)
+    {
+        if(room['type'] === 'public')
+        {   
+            let curRoom = {
+                'size' : room['participants'].length + 1,
+                'creationTime' : room['startTime'],
+                'name' : room['name'],
+                'desc' : room['description'],
+                'id'   : room['roomId'],
+                'host' : {
+                    'imageUrl' : room['host']['imageUrl'],
+                    'login' : room['host']['login']
+                },
+                'participants' : [...room['participants']]
+            };
+            response.push(curRoom);
+        }
+    }
+    // fetch name, desc, host, creation time, number of participants, profile photos of first four people and link to join the room.
+    res.json(response);    
+
 })
 
 server.listen(PORT,()=>{
