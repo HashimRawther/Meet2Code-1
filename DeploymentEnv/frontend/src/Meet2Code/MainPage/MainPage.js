@@ -13,7 +13,9 @@ export default function MainPage(props) {
 	let [prShowCreate,setprShowCreate]=useState(false);
 	let [joinShow,setJoinShow]=useState(false);
 	let [createShow,setCreateShow]=useState(false);
+    let [publicRooms, setPublicRooms] = useState([]);
     const [dispModal,setDispModal]=useState(0);
+
 	let socket = io(`${serverEndpoint}`);
     let navigate=useNavigate();
 	useEffect(()=>{
@@ -23,6 +25,19 @@ export default function MainPage(props) {
 		else 
 			doc.style.display="none"
 	},[ddst]);
+
+    useEffect(() => {
+
+        let fetchPublicRooms = async () => {
+
+            let publicRoomsRes = await fetch(serverEndpoint + '/publicRooms');
+            publicRoomsRes  = await publicRoomsRes.json();
+            setPublicRooms(publicRoomsRes);
+            console.log(publicRoomsRes);
+        }
+        fetchPublicRooms();
+
+    },[]);
 
 	let toggleDropDown=()=>{
         setddst(!ddst)
@@ -125,11 +140,11 @@ export default function MainPage(props) {
         let body={}
         for(let pair of formData)
             body[`${pair[0]}`]=pair[1]
-        console.log(body)
         let infoText=document.getElementById("info-text-join-room")
         //Emit the details of the room and join the room.
         socket.emit('joinRoom',{...body,participant:props.user._id},(roomId,status)=>{
-
+            
+            console.log(roomId, status)
             if(status===401){
                 //User is already in a room.
                 showModal(roomId)
@@ -316,6 +331,10 @@ export default function MainPage(props) {
         .homePageTopBarName{
             color:${props.theme[3]};
         }
+        .publicRoomComponent{
+            background-color:${props.theme[1]};
+            color:${props.theme[3]};
+        }
 
 	`,
 		<div className='main-page'>
@@ -433,6 +452,55 @@ export default function MainPage(props) {
                         :""}
                     </div>
                 </div>
+
+                <div className='home-public-display'>
+                    {
+                        publicRooms.map((room,index) => {
+
+                            return <div key={index} className='publicRoomComponent'>
+                                        <div style={{textAlign:'center'}}>
+                                            <h3>{room['name']}</h3>
+                                        </div>
+                                        <div className='roomDispBorder'></div>
+                                        <div style={{marginTop : "5%"}}>
+                                            <h4>{room['desc']}</h4>
+                                        </div>
+                                        <div style={{marginTop : "5%"}}> 
+                                            <img src={room['host']['imageUrl']} className='user-dp'
+                                            title={room['host']['login']}
+                                            alt='emplty'></img>
+                                            {   
+                                                room['participants'].map((participant,index) => {
+                                                    return  <img src={participant['imageUrl']} 
+                                                                 alt='emplty'
+                                                                 className='user-dp'
+                                                                 title={participant['login']}
+                                                            >
+                                                            </img>
+                                                })
+                                            }
+                                        </div>
+                                        <div style={{alignItems:"center", 
+                                                    textAlign:"center", 
+                                                    color:"green", 
+                                                    fontSize:"20px",
+                                                    cursor:"pointer"}}
+                                                    type="submit"
+
+                                            onClick={async(e)=>{
+                                                        e.preventDefault();
+                                                        const formData = new FormData();
+                                                        formData.append('id',room['id']);
+                                                        formData.append('type','public');
+                                                        await joinRoom(formData)
+                                                    }}
+                                        >
+                                            Join room
+                                        </div>
+                                   </div>    
+                        })
+                    }
+                    </div>
             </div>
 		</div>
     )
