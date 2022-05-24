@@ -13,7 +13,7 @@ import TitleArea from './components/TitleArea/TitleArea';
 import UtilityArea from './components/UtilityArea/UtilityArea';
 
 import {chatSocketListeners,chatStopListeners} from './Modules/Chat/Message';
-
+import {participantsListener,stopParticipantsListener} from './Modules/Participants/UsersInRoom';
 let socket;
 const SAVE_INTERVAL_MS = 2000
 export default function Meet(props) {
@@ -123,7 +123,14 @@ export default function Meet(props) {
         return(()=>{
             chatStopListeners(socket);
         })
-    },[messages])
+    },[messages]);
+
+    useEffect(()=>{
+        participantsListener(socket,usersInRoom,setUsersInRoom);
+        return(()=>{
+            stopParticipantsListener(socket);
+        })
+    },[usersInRoom]);
     
 
     
@@ -140,7 +147,7 @@ export default function Meet(props) {
             <div id='tab-switch' className='tab-switch'><TabArea {...props} tabs={tabs} setTabTooltip={setTabTooltip} setTabs={setTabs}/></div>
             <div id='comm-switch' className='comm-switch'><CommSwitch {...props} setCommTooltip={setCommTooltip} tabs={tabs} setComm={setComm} comm={comm}/></div>
             {
-                comm!==0? (<div id='app-container' className='App-container'><MainArea {...props} tabs={tabs} className="half-size"/> <CommunicationArea {...props} name={name} room={room} socket={socket} id={props.user._id} messages={messages} message={message} setMessage={setMessage} prevTab={prevTab} setPrevTab={setPrevTab} comm={comm} tabs={tabs} setComm={setComm} setTabs={setTabs}/></div>) : (<div id='app-container' className='App-container'><MainArea {...props} tabs={tabs} className="full-size"/></div>)
+                comm!==0? (<div id='app-container' className='App-container'><MainArea {...props} tabs={tabs} className="half-size"/> <CommunicationArea {...props} users={usersInRoom} name={name} room={room} socket={socket} id={props.user._id} messages={messages} message={message} setMessage={setMessage} prevTab={prevTab} setPrevTab={setPrevTab} comm={comm} tabs={tabs} setComm={setComm} setTabs={setTabs}/></div>) : (<div id='app-container' className='App-container'><MainArea {...props} tabs={tabs} className="full-size"/></div>)
             }
         </div>
     )
