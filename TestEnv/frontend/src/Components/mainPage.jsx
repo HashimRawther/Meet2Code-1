@@ -15,7 +15,7 @@ const MainPage=(props)=>{
     let [createShow,setCreateShow]=useState(false);
     let socket = io(`${serverEndpoint}`);
 
-    let history=useHistory()
+    let history=useHistory();
 
     useEffect(()=>{
         console.log(props)

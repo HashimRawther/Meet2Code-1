@@ -3,16 +3,17 @@ import './main.css';
 import { useState, useEffect } from 'react';
 import serverEndpoint from './config';
 import {
-  BrowserRouter as Router,
-  Route,
-  Switch
-} from 'react-router-dom'
+  BrowserRouter,
+  Routes,
+  Route
+} from 'react-router-dom';
+
 import Login from './OAuth/Login';
 import MainPage from './MainPage/MainPage';
 import Room from './Room/Room';
 export default function Main() {
     
-    //['background-color', 'window-color', 'icon-color','text-color','selected-item-color','black to icon-color filter']
+    //['background-color', 'window-color', 'icon-color','text-color','selected-item-color/secondary-text-color','black to icon-color filter']
     const colorPallete = [
         ['#000000','#222221','#A1A1A1','#D5D5D5','#666666','invert(72%) sepia(0%) saturate(108%) hue-rotate(183deg) brightness(93%) contrast(78%)'],
         ['#000205','#0E111A','#03050B','#BCF4EF','#199C95','invert(2%) sepia(8%) saturate(4372%) hue-rotate(188deg) brightness(103%) contrast(101%)'],
@@ -26,28 +27,28 @@ export default function Main() {
     let [user,setUser]=useState({});
     let [loggedin,setLoggedin]=useState(false);
     let [loading,setLoading]=useState(true);
+    
     useEffect(()=>{
-        async function getInfo(){
-            let loginfo=await fetch(`${serverEndpoint}/oauth/isloggedin`,{
-                method:"GET",
-                credentials:"include"
-            })
-        
-            loginfo=await loginfo.json()
-            if(loginfo.loggedin===true){
-                setUser(loginfo.user)
-                setLoggedin(true);
-                setLoading(false);
-            }
-            else{
-                console.log("Destoryed",loginfo);
-                setLoading(false);
-                console.log('loading',loading);
-            }
-        }
         getInfo()
     },[])
     
+    async function getInfo(){
+        let loginfo=await fetch(`${serverEndpoint}/oauth/isloggedin`,{
+            method:"GET",
+            credentials:"include"
+        })
+    
+        loginfo=await loginfo.json()
+        if(loginfo.loggedin===true){
+            setUser(loginfo.user)
+            setLoggedin(true);
+            setLoading(false);
+        }
+        else{
+            setLoading(false);
+        }
+    }
+
     let logOutUser=async()=>{
     
         fetch(`${serverEndpoint}/oauth/logout`,{
@@ -62,8 +63,7 @@ export default function Main() {
         })
     }
 
-    const renderHome=()=>{      //Decides which component to run
-        console.log(loading)
+    const renderHome=()=>{
         if(loading===true)
             return <div></div>
 
@@ -77,15 +77,14 @@ export default function Main() {
 
     return (
         <div className='main-app'>
-            <Router>
-                <Switch>
-                    <Route exact path='/'>
-                    {renderHome()}
-                    </Route> 
-                    <Route exact path='/room/:id' component={(props)=><Room {...props} user={{...user}}></Room>}> 
-                    </Route>
-                </Switch>
-            </Router>
+            <BrowserRouter>
+                <Routes>
+                    <Route path='/' element={renderHome()}/>
+                         
+                    <Route path='/room/:id' element={
+                        <Room theme={theme} setTheme={setTheme} user={{...user}}></Room>}/>
+                </Routes>
+            </BrowserRouter>
         </div>
     )
 }

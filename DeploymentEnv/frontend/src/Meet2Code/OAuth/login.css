@@ -33,6 +33,9 @@
     font-size: 1.3em;
     border-radius: 1em;
 }
+.login-main-auth:hover{
+    cursor: pointer;
+}
 
 #google-icon{
     width: 2em;

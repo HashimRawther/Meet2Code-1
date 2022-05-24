@@ -7,6 +7,8 @@ const http=require("http");
 const path=require('path');
 const session = require("express-session");
 const mongoose = require("mongoose");
+const Room=require('./Schemas/room');
+const User=require('./Schemas/user');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
 
@@ -14,8 +16,11 @@ const PORT = process.env.PORT || 9000;
 
 const router = require('./Routers/router');
 const oauth=require('./Routers/oauth');
-
 const {loggedinUserDetails,isLoggedin,notLoggedin} = require('./Components/loginDetails');
+const terminate = require('./Components/terminate');
+
+const leaveRoom = require('./SocketListener/leaveRoom');
+
 app.use(router);
 app.use(cors({credentials:true, origin:["http://localhost:3000"]}));
 app.options('*', cors());
@@ -50,3 +55,9 @@ server.listen(PORT,()=>{
     console.log('Server started on port: ',PORT);
 });
 app.use(loggedinUserDetails);
+
+io.on('connection',(socket)=>{
+    console.log('hello');
+    leaveRoom.leaveRoomListener(io,socket,User,Room);
+    // terminate.terminateUser(socket);
+});

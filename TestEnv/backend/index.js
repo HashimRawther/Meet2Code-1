@@ -149,8 +149,7 @@ io.on('connection',(socket)=>{
         socket.join(`${roomId}`);
         try{
             //Get the details of user who emitted the event
-            let user=await User.findById(arg.host)
-
+            let user=await User.findById(arg.host);
             if(user['room']!==undefined && user['room']!==null){       //Check if user is already in a room
                 // console.log(401)
                 let room=await Room.findById(user['room'])
@@ -259,7 +258,7 @@ io.on('connection',(socket)=>{
         try{
             let room=arg.roomID;
             let name=arg.user.login;
-            // console.log(room);
+            console.log(room);
             let userRoom=await Room.findOne({roomId: room}) //Get the room details
             if(userRoom===undefined || userRoom===null){    //Room doesn't exist
                 // redirect(undefined,404)
@@ -289,6 +288,7 @@ io.on('connection',(socket)=>{
         io.to(room).emit('canvas-data',data);
     });
     socket.on('sendMessage',(message,id,name,room,callback)=>{
+        console.log(message,room);
         io.to(room).emit('message',{id:id,user:name,text:message});
         callback();
     })

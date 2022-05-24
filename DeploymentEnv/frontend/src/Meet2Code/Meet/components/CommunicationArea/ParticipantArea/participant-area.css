@@ -1,0 +1,8 @@
+.participant-area{
+    border-radius: 1em;
+    height: 100%;
+    width: 100%;
+}
+.close-participant-btn{
+    position:absolute;
+}

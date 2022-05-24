@@ -1,0 +1,8 @@
+.video-area{
+    border-radius: 1em;
+    height: 100%;
+    width: 100%;
+}
+.close-video-btn{
+    position:absolute;
+}

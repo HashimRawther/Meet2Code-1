@@ -11,6 +11,14 @@ import VC from './Modules/VideoCall/vc-component'
 import Participant from './Modules/Participants/Participant';
 import Container from './Modules/Whiteboard/container/Container';
 import TextEditor from './Modules/DocEditor/TextEditor';
+
+import PeerInit from './Modules/VideoCall/peer-init'
+import {toggleAudio, toggleVideo} from './Modules/VideoCall/vc'
+import CodeEditor from './Modules/CodeEditor/CodeEditor'
+import serverEndPoint  from '../../config';
+import CodeExecutor from './Modules/CodeExecutor/CodeExecutor';
+
+
 import logo from '../../Images/SSN.png';
 // import video from '../../Images/video.png';
 import chat from '../../Images/chat.png';
@@ -20,11 +28,6 @@ import videoOff from '../../Images/videoOff.png';
 import mute from '../../Images/mute.png';
 import unmute from '../../Images/unmute.png';
 import endCall from '../../Images/endCall.png';
-import PeerInit from './Modules/VideoCall/peer-init'
-import {toggleAudio, toggleVideo} from './Modules/VideoCall/vc'
-import CodeEditor from './Modules/CodeEditor/CodeEditor'
-import serverEndPoint  from '../../config';
-import CodeExecutor from './Modules/CodeExecutor/CodeExecutor';
 let socket;
 
 const SAVE_INTERVAL_MS = 2000
