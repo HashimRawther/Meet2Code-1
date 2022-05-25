@@ -136,7 +136,7 @@ function renderer(socket,myPeer, ROOM_ID, username, audioEnable = true, videEnab
             const video = document.createElement('video')
 
             call.on('stream', userVideoStream => {
-                socket.emit('peer-track-sender')
+                socket.emit('peer-track-sender',ROOM_ID)
                 addVideoStream(video, userVideoStream)
 
             })
@@ -155,7 +155,7 @@ function renderer(socket,myPeer, ROOM_ID, username, audioEnable = true, videEnab
         })
 
         socket.on('user-connected', userId => {
-            socket.emit('peer-track-sender')
+            socket.emit('peer-track-sender',ROOM_ID)
             connectToNewUser(userId, stream)
         })
 
@@ -252,7 +252,7 @@ function renderer(socket,myPeer, ROOM_ID, username, audioEnable = true, videEnab
         if(container.children.length===2)
         {
             videoGrid.append(container)
-            roomMediaStatus() 
+            roomMediaStatus()
         }   
 
     }
@@ -260,30 +260,30 @@ function renderer(socket,myPeer, ROOM_ID, username, audioEnable = true, videEnab
     return
 }
 
-function toggleAudio(socket,myPeer)
+function toggleAudio(socket,myPeer,roomId)
 {
     localStream.getAudioTracks()[0].enabled = !localStream.getAudioTracks()[0].enabled
 
     var audioStatuses = document.getElementsByClassName('audioStatus')
     audioStatuses[0].replaceWith(audioIcon(localStream.getAudioTracks()[0].enabled))
 
-    socket.emit('peer-track-sender')
+    socket.emit('peer-track-sender',roomId)
     setTimeout( ()=>{
-        socket.emit('audio-toggle-sender', myPeer.id, localStream.getAudioTracks()[0].enabled)
+        socket.emit('audio-toggle-sender', myPeer.id, localStream.getAudioTracks()[0].enabled,roomId)
     }, 50)
 
 }
 
-function toggleVideo(socket,myPeer)
+function toggleVideo(socket,myPeer,roomId)
 {
     localStream.getVideoTracks()[0].enabled = !localStream.getVideoTracks()[0].enabled
 
     var videoStatuses = document.getElementsByClassName('videoStatus')
     videoStatuses[0].replaceWith(videoIcon(localStream.getVideoTracks()[0].enabled))
 
-    socket.emit('peer-track-sender')
+    socket.emit('peer-track-sender',roomId)
     setTimeout( ()=>{
-        socket.emit('video-toggle-sender', myPeer.id, localStream.getVideoTracks()[0].enabled)
+        socket.emit('video-toggle-sender', myPeer.id, localStream.getVideoTracks()[0].enabled,roomId)
     }, 50)
 
 }

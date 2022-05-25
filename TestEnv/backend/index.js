@@ -87,7 +87,7 @@ const defaultValue = ""
 
 io.on('connection',(socket)=>{
 
-    socket.on('audio-toggle-sender', (userId, astatus) => {
+    socket.on('audio-toggle-sender', (userId, astatus,roomId) => {
 		Peer.updateOne({peerid: userId}, {
 			audioStatus: astatus, 
 		}, function(err, numberAffected, rawResponse) {
@@ -96,7 +96,7 @@ io.on('connection',(socket)=>{
 		socket.broadcast.to(roomId).emit('audio-toggle-receiver', {userId: userId, audioStatus: astatus})
 	})
 
-	socket.on('video-toggle-sender', (userId, vstatus) => {
+	socket.on('video-toggle-sender', (userId, vstatus,roomId) => {
 		Peer.updateOne({peerid: userId}, {
 			videoStatus: vstatus, 
 		}, function(err, numberAffected, rawResponse) {
@@ -105,9 +105,9 @@ io.on('connection',(socket)=>{
 		socket.broadcast.to(roomId).emit('video-toggle-receiver', {userId: userId, videoStatus: vstatus})
 	})
 
-	socket.on('peer-track-sender', ()=>{
+	socket.on('peer-track-sender', (roomId)=>{
 
-		Peer.find({roomid: room}, {'_id': 0, 'username': 1, 'peerid': 1, 'audioStatus': 1, 'videoStatus': 1})
+		Peer.find({roomid: roomId}, {'_id': 0, 'username': 1, 'peerid': 1, 'audioStatus': 1, 'videoStatus': 1})
 		.then((mediaRes)=>{
 
 			let res = mediaRes.map((x)=>x.peerid)
@@ -116,7 +116,7 @@ io.on('connection',(socket)=>{
 	})
 
 	socket.on('join-room', (uname, room_id, userId, astatus, vstatus) => {
-		roomId = room_id
+		let roomId = room_id
 		socket.join(roomId)
 		socket.broadcast.to(roomId).emit('user-connected', userId)
 		// peers.push(userId)
@@ -177,7 +177,7 @@ io.on('connection',(socket)=>{
     })
     //Join an existing room
     socket.on('joinRoom',async(arg,redirect)=>{
-        socket.emit('con established');
+        
         try{
             let room=await Room.findOne({roomId: arg.id}) //Get the room details
             
