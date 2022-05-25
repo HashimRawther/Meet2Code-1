@@ -7,13 +7,14 @@ import Chat from './Modules/Chat/Chat/Chat';
 import { jsPDF } from 'jspdf';
 import './styles.css';
 import './Meet.css';
-import VC from './Modules/VideoCall/vc-component'
 import Participant from './Modules/Participants/Participant';
 import Container from './Modules/Whiteboard/container/Container';
 import TextEditor from './Modules/DocEditor/TextEditor';
 
+import VC from './Modules/VideoCall/vc-component'
 import PeerInit from './Modules/VideoCall/peer-init'
 import { toggleAudio, toggleVideo } from './Modules/VideoCall/vc'
+
 import CodeEditor from './Modules/CodeEditor/CodeEditor'
 import serverEndPoint from '../../config';
 import CodeExecutor from './Modules/CodeExecutor/CodeExecutor';

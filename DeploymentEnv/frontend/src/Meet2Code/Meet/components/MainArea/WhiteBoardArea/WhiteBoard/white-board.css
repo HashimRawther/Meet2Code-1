@@ -33,11 +33,25 @@
 }
 
 #board-erase-icon{
-    height: 2em;
-    width: 2em;
+    height: 3em;
+    width: 3em;
 }
 
 #board-brush-icon{
-    height: 2em;
-    width: 2em;
+    height: 3em;
+    width: 3em;
+}
+
+#erase{
+    background:none;
+    border: none;
+}
+
+#brush{
+    background:none;
+    border: none;
+}
+.brush-size-container select{
+    background:none;
+    
 }

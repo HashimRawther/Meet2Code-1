@@ -11,6 +11,8 @@ import {
 import Login from './OAuth/Login';
 import MainPage from './MainPage/MainPage';
 import Room from './Room/Room';
+import io from 'socket.io-client';
+let socket;
 export default function Main() {
     
     //['background-color', 'window-color', 'icon-color','text-color','selected-item-color/secondary-text-color','black to icon-color filter']
@@ -29,7 +31,14 @@ export default function Main() {
     let [loading,setLoading]=useState(true);
     
     useEffect(()=>{
-        getInfo()
+        getInfo();
+        var connectionOptions = {
+            "force new connection": true,
+            "reconnectionAttempts": "Infinity",
+            "timeout": 10000,
+            "transports": ["websocket"]
+        };
+        socket = io(serverEndpoint,connectionOptions);
     },[])
     
     async function getInfo(){
@@ -71,7 +80,7 @@ export default function Main() {
             return <Login theme={theme} setTheme={setTheme}></Login>
         }
         else{
-            return  <MainPage theme={theme} setTheme={setTheme} user={user} loggedin={loggedin} logOutUser={logOutUser}></MainPage>
+            return  <MainPage socket={socket} theme={theme} setTheme={setTheme} user={user} loggedin={loggedin} logOutUser={logOutUser}></MainPage>
         }
     }
 
@@ -82,7 +91,7 @@ export default function Main() {
                     <Route path='/' element={renderHome()}/>
                          
                     <Route path='/room/:id' element={
-                        <Room theme={theme} setTheme={setTheme} user={{...user}}></Room>}/>
+                        <Room socket={socket} theme={theme} setTheme={setTheme} user={{...user}}></Room>}/>
                 </Routes>
             </BrowserRouter>
         </div>

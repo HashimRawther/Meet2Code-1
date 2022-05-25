@@ -3,7 +3,6 @@ import './main-page.css';
 import Style from 'style-it';
 import { useState, useEffect } from 'react';
 import serverEndpoint from '../config';
-import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 
 export default function MainPage(props) {
@@ -16,7 +15,6 @@ export default function MainPage(props) {
     let [publicRooms, setPublicRooms] = useState([]);
     const [dispModal,setDispModal]=useState(0);
 
-	let socket = io(`${serverEndpoint}`);
     let navigate=useNavigate();
 	useEffect(()=>{
 		let doc=document.getElementById("profileDropdown-content")
@@ -33,7 +31,6 @@ export default function MainPage(props) {
             let publicRoomsRes = await fetch(serverEndpoint + '/publicRooms');
             publicRoomsRes  = await publicRoomsRes.json();
             setPublicRooms(publicRoomsRes);
-            console.log(publicRoomsRes);
         }
         fetchPublicRooms();
 
@@ -96,13 +93,11 @@ export default function MainPage(props) {
 
     //Join the already existing room.
     let joinExistingRoom=(id)=>{
-        console.log(id);
         navigate(`/room/${id}`);
     }
 
     let leaveExistingRoom=()=>{
-        socket.emit('leaveRoom',{host:props.user._id},(status)=>{
-            console.log(status)
+        props.socket.emit('leaveRoom',{host:props.user._id},(status)=>{
             let btnclose = document.getElementById('w-change-close');
             btnclose.click()
         })
@@ -116,15 +111,12 @@ export default function MainPage(props) {
         for(let pair of formData)
             body[`${pair[0]}`]=pair[1]
 
-        console.log('body',body);
 
-        socket.emit('createRoom',{...body, host:props.user._id},(roomId,status)=>{
+        props.socket.emit('createRoom',{...body, host:props.user._id},(roomId,status)=>{
             if(status===200 && roomId!==undefined && roomId!==null){
-                console.log(roomId);
                 navigate(`/room/${roomId}`);
             }
             else if(status===401){
-                console.log('user in room',roomId);
                 //User is already in a room.
                 // var myModal = new bootstrap.Modal(document.getElementById('myModal'), options)
                 // id="w-change-location" data-toggle="modal" data-target="#locModal"
@@ -142,9 +134,8 @@ export default function MainPage(props) {
             body[`${pair[0]}`]=pair[1]
         let infoText=document.getElementById("info-text-join-room")
         //Emit the details of the room and join the room.
-        socket.emit('joinRoom',{...body,participant:props.user._id},(roomId,status)=>{
+        props.socket.emit('joinRoom',{...body,participant:props.user._id},(roomId,status)=>{
             
-            console.log(roomId, status)
             if(status===401){
                 //User is already in a room.
                 showModal(roomId)
@@ -188,7 +179,6 @@ export default function MainPage(props) {
         }
         //hide the modal
         btnclose.addEventListener('click', (e) => {
-            console.log("Clicked")
             setDispModal(0);
         });
     }
@@ -471,7 +461,8 @@ export default function MainPage(props) {
                                             alt='emplty'></img>
                                             {   
                                                 room['participants'].map((participant,index) => {
-                                                    return  <img src={participant['imageUrl']} 
+                                                    return  <img key={participant['login']}
+                                                                src={participant['imageUrl']} 
                                                                  alt='emplty'
                                                                  className='user-dp'
                                                                  title={participant['login']}

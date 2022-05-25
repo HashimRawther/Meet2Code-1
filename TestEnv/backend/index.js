@@ -15,12 +15,15 @@ const Room=require('./Schemas/room');
 const User=require('./Schemas/user');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
+// const {ExpressPeerServer} = require('peer');
 
 const Document = require("./Schemas/Document")
 const Peer = require('./Schemas/peerinfos')
 const PORT = process.env.PORT || 9000;
 
 const router = require('./Routers/router');
+
+
 
 app.use(router);
 app.use(cors({credentials:true, origin:["http://localhost:3000"]}));
@@ -79,6 +82,7 @@ const io = socket(server,{cors: {
     }
 });
 
+
 const defaultValue = ""
 
 io.on('connection',(socket)=>{
@@ -103,7 +107,7 @@ io.on('connection',(socket)=>{
 
 	socket.on('peer-track-sender', ()=>{
 
-		Peer.find({roomid: roomId}, {'_id': 0, 'username': 1, 'peerid': 1, 'audioStatus': 1, 'videoStatus': 1})
+		Peer.find({roomid: room}, {'_id': 0, 'username': 1, 'peerid': 1, 'audioStatus': 1, 'videoStatus': 1})
 		.then((mediaRes)=>{
 
 			let res = mediaRes.map((x)=>x.peerid)
@@ -124,7 +128,7 @@ io.on('connection',(socket)=>{
 			videoStatus: vstatus
 		})
 		peer.save()
-		.then((res)=>console.log(res))
+		.then((res)=>console.log('Peer saved'))
 		.catch(err=>console.log(err))
 
 		socket.on('disconnect', () => {
@@ -173,9 +177,10 @@ io.on('connection',(socket)=>{
     })
     //Join an existing room
     socket.on('joinRoom',async(arg,redirect)=>{
+        socket.emit('con established');
         try{
             let room=await Room.findOne({roomId: arg.id}) //Get the room details
-            console.log(room, arg.id);
+            
             if(room===undefined || room===null){    //Room doesn't exist
                 redirect(undefined,404)
                 return

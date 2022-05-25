@@ -12,6 +12,18 @@ const WhiteBoard = (props) => {
             color:${props.theme[3]};
             background-color:${props.theme[1]};
         }
+        #board-erase-icon{
+            filter: ${props.theme[6]};
+        }
+        .brush-size-container select{
+            color:${props.theme[3]};
+            border: 1px solid ${props.theme[4]};
+        }
+        .color-picker-container input{
+            background:none;
+            border: none;
+            transform: translateY(0.3em);
+        }
     `,  
         <div className='outer-container'>
             <div className='tools-section'>

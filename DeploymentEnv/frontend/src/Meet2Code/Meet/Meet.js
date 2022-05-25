@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react'
 import './meet.css';
 import Style from 'style-it';
 import { useParams } from 'react-router-dom';
-import io from 'socket.io-client';
 import serverEndpoint from '../config';
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
@@ -13,13 +12,16 @@ import MainArea from './components/MainArea/MainArea';
 import TabArea from './components/TabArea/TabArea';
 import TitleArea from './components/TitleArea/TitleArea';
 import UtilityArea from './components/UtilityArea/UtilityArea';
+import InviteModal from './components/InviteModal/InviteModal';
 
 import { chatSocketListeners, chatStopListeners } from './Modules/Chat/Message';
 import { participantsListener, stopParticipantsListener } from './Modules/Participants/UsersInRoom';
 import {quillLoadDoc,quillUpdater,stopQuillListener} from './Modules/DocEditor/QuillListeners'
 import {updateCanvasListener,stopCanvasListeners} from './Modules/WhiteBoard/draw';
-import InviteModal from './components/InviteModal/InviteModal';
-let socket;
+import {leaveMeet} from './Modules/LeaveRoom/LeaveRoom';
+import {CreatePeer} from './Modules/VideoCall/peer-init';
+
+let myPeer;
 const SAVE_INTERVAL_MS = 2000;
 const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
@@ -40,8 +42,8 @@ export default function Meet(props) {
     const [commTooltip, setCommTooltip] = useState(0);
     const [tabTooltip, setTabTooltip] = useState(0);
     const [screenShare, setScreenShare] = useState(0);
-    const [videoState, setVideoState] = useState(0);
-    const [audioState, setAudioState] = useState(0);
+    const [videoState, setVideoState] = useState(true);
+    const [audioState, setAudioState] = useState(true);
     const [showInviteModal,setShowInviteModal] = useState(0);
 
 
@@ -58,10 +60,9 @@ export default function Meet(props) {
     const [roomName, setRoomName] = useState();
     const [clear, setClear] = useState(0);
     const [save, setSave] = useState(0);
-    // const [myPeer] = useState(PeerInit())
     const ENDPOINT = serverEndpoint;
-    let [question, setQuestion] = useState(undefined);
-    let [questionText, setQuestionText] = useState("");
+    // let [question, setQuestion] = useState(undefined);
+    // let [questionText, setQuestionText] = useState("");
 
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
@@ -78,9 +79,6 @@ export default function Meet(props) {
         setQuill(q)
     }, []);
 
-    useEffect(()=>{
-        console.log(showInviteModal);
-    },[showInviteModal]);
     useEffect(() => {
         const handleMouseEvent = (evt) => {
             const x = evt.clientX, y = evt.clientY;
@@ -134,73 +132,68 @@ export default function Meet(props) {
 
 
     useEffect(() => {
-        var connectionOptions = {
-            "force new connection": true,
-            "reconnectionAttempts": "Infinity",
-            "timeout": 10000,
-            "transports": ["websocket"]
-        };
-        socket = io(ENDPOINT, connectionOptions);
+        
+        myPeer = CreatePeer();
         let name = props.user.login;
         setName(name)
         setRoom(roomID);
         let user = props.user;
-        socket.emit('join', { roomID, user }, (roomName) => {
+        props.socket.emit('join', { roomID, user }, (roomName) => {
             setRoomName(roomName);
         });
         return () => {
-            socket.off();
+            props.socket.off();
         }
-    }, [ENDPOINT, roomID, props.user]);
+    }, [ENDPOINT, roomID, props.user, props.socket]);
 
     useEffect(() => {
-        chatSocketListeners(socket, setMessages, messages);
+        chatSocketListeners(props.socket, setMessages, messages);
         return (() => {
-            chatStopListeners(socket);
+            chatStopListeners(props.socket);
         })
-    }, [messages]);
+    }, [messages, props.socket]);
 
     useEffect(() => {
-        participantsListener(socket, usersInRoom, setUsersInRoom);
+        participantsListener(props.socket, usersInRoom, setUsersInRoom);
         return (() => {
-            stopParticipantsListener(socket);
+            stopParticipantsListener(props.socket);
         })
-    }, [usersInRoom]);
+    }, [usersInRoom, props.socket]);
 
     useEffect(() => {
-        if (socket == null || quill == null) return;
-        quillLoadDoc(socket,quill);
-        socket.emit("get-document", room);
-    }, [quill, room])
+        if (props.socket == null || quill == null) return;
+        quillLoadDoc(props.socket,quill);
+        props.socket.emit("get-document", room);
+    }, [quill, room, props.socket])
 
     useEffect(() => {
-        if (socket == null || quill == null) return;
+        if (props.socket == null || quill == null) return;
 
         const interval = setInterval(() => {
-            socket.emit("save-document", quill.getContents())
+            props.socket.emit("save-document", quill.getContents())
         }, SAVE_INTERVAL_MS);
 
-        quillUpdater(socket,quill);
+        quillUpdater(props.socket,quill);
         
         const handler = (delta, oldDelta, source) => {
             if (source !== "user") return
-            socket.emit("send-changes", delta)
+            props.socket.emit("send-changes", delta)
         }
         quill.on("text-change", handler)
 
         return () => {
             clearInterval(interval);
-            stopQuillListener(socket);
+            stopQuillListener(props.socket);
             quill.off("text-change", handler);
         }
-    }, [quill]);
+    }, [quill, props.socket]);
 
     useEffect(()=>{
-        updateCanvasListener(socket,ctx,setImage);
+        updateCanvasListener(props.socket,ctx,setImage);
         return () =>{
-            stopCanvasListeners(socket);
+            stopCanvasListeners(props.socket);
         } 
-    },[ctx]);
+    },[ctx, props.socket]);
 
     return Style.it(`
         .meet-app{
@@ -214,7 +207,8 @@ export default function Meet(props) {
                     view={view} 
                     roomName={roomName} 
                     commTooltip={commTooltip} 
-                    tabTooltip={tabTooltip} />
+                    tabTooltip={tabTooltip} 
+                />
             </div>
             <div id='utilities' className='utilities'>
                 <UtilityArea 
@@ -222,7 +216,6 @@ export default function Meet(props) {
                     view={view} 
                     screenShare={screenShare} 
                     tabs={tabs}
-                    socket={socket}
                     ctx={ctx}
                     room={room}
                     setScreenShare={setScreenShare} 
@@ -231,7 +224,9 @@ export default function Meet(props) {
                     audioState={audioState} 
                     setAudioState={setAudioState} 
                     setShowInviteModal={setShowInviteModal}
-                    />
+                    leaveMeet={leaveMeet}
+                    myPeer={myPeer}
+                />
             </div>
             <div id='tab-switch' className='tab-switch'>
                 <TabArea 
@@ -239,7 +234,8 @@ export default function Meet(props) {
                     view={view} 
                     tabs={tabs} 
                     setTabTooltip={setTabTooltip} 
-                    setTabs={setTabs} />
+                    setTabs={setTabs} 
+                />
             </div>
             <div id='comm-switch' className='comm-switch'>
                 <CommSwitch 
@@ -248,7 +244,8 @@ export default function Meet(props) {
                     setCommTooltip={setCommTooltip} 
                     tabs={tabs} 
                     setComm={setComm}
-                    comm={comm} />
+                    comm={comm} 
+                />
             </div>
             {
                 comm !== 0 ? 
@@ -261,20 +258,19 @@ export default function Meet(props) {
                         setClear={setClear} 
                         room={room} 
                         image={image} 
-                        socket={socket} 
                         ctx={ctx} 
                         setctx={setctx} 
                         timeout={timeout} 
                         settimeOut={settimeOut} 
                         wrapperRef={wrapperRef} 
                         tabs={tabs} 
-                        className="half-size" /> 
+                        className="half-size" 
+                    /> 
                     <CommunicationArea 
                         {...props} 
                         users={usersInRoom} 
                         name={name} 
                         room={room} 
-                        socket={socket} 
                         id={props.user._id} 
                         messages={messages} 
                         message={message} 
@@ -283,7 +279,9 @@ export default function Meet(props) {
                         setPrevTab={setPrevTab} 
                         comm={comm} tabs={tabs} 
                         setComm={setComm} 
-                        setTabs={setTabs} />
+                        setTabs={setTabs}
+                        myPeer={myPeer} 
+                    />
                 </div>) : 
                 (<div id='app-container' className='App-container'>
                     <MainArea  
@@ -293,18 +291,24 @@ export default function Meet(props) {
                         clear={clear} 
                         setClear={setClear} 
                         room={room} 
-                        image={image} 
-                        socket={socket} 
+                        image={image}  
                         ctx={ctx} 
                         setctx={setctx} 
                         timeout={timeout} 
                         settimeOut={settimeOut} 
                         wrapperRef={wrapperRef} 
                         tabs={tabs}
-                        className="full-size" />
+                        className="full-size" 
+                    />
                 </div>)
             }
-            <div className='invite-modal' show={showInviteModal}><InviteModal {...props} room={room} setShowInviteModal={setShowInviteModal}/></div>
+            <div className='invite-modal' show={showInviteModal}>
+                <InviteModal 
+                    {...props} 
+                    room={room} 
+                    setShowInviteModal={setShowInviteModal}
+                />
+            </div>
         </div>
     )
 }

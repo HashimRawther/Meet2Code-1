@@ -4,10 +4,10 @@ import Style from 'style-it';
 import {savePDF} from '../../Modules/DocEditor/pdfDownloader';
 import {clearCanvas} from '../../Modules/WhiteBoard/draw';
 import {saveCanvas} from '../../Modules/WhiteBoard/canvasDownloader';
+import {toggleAudio,toggleVideo} from '../../Modules/VideoCall/vc';
 export default function UtilityArea(props) {
   const handleDownload=(e) =>{
     e.preventDefault();
-    console.log(props.tabs);
     if(props.tabs===2)
     savePDF();
     if(props.tabs===3)
@@ -76,26 +76,22 @@ export default function UtilityArea(props) {
           }
         </button>
         <button className='cam-btn' onClick={()=>{
-          if(props.videoState === 1) 
-            props.setVideoState(0);
-          else 
-            props.setVideoState(1);
+          props.setVideoState(!props.videoState);
+          toggleVideo(props.socket,props.myPeer);
         }}>
           {
-            props.videoState === 1 ? <img id='cam-icon' src='/icons/video-camera.png' alt='img'/> : <img id='cam-icon' src='/icons/no-video.png' alt='img'/>
+            props.videoState ? <img id='cam-icon' src='/icons/video-camera.png' alt='img'/> : <img id='cam-icon' src='/icons/no-video.png' alt='img'/>
           }
         </button>
         <button className='mic-btn' onClick={()=>{
-          if(props.audioState === 1) 
-            props.setAudioState(0);
-          else 
-            props.setAudioState(1);
+          props.setAudioState(!props.audioState);
+          toggleAudio(props.socket,props.myPeer);
         }}>
           {
-            props.audioState === 1 ? <img id='mic-icon' src='/icons/microphone.png' alt='img'/> : <img id='mic-icon' src='/icons/mute.png' alt='img'/>
+            props.audioState ? <img id='mic-icon' src='/icons/microphone.png' alt='img'/> : <img id='mic-icon' src='/icons/mute.png' alt='img'/>
           }
         </button>
-        <button className='end-btn'>
+        <button className='end-btn' onClick={(e)=>props.leaveMeet(e,props.socket,props.user._id)}>
           <img id='end-icon' src='/icons/phone-call-end.png' alt='img'/>
         </button>
         <button className='download-btn' onClick={handleDownload}>

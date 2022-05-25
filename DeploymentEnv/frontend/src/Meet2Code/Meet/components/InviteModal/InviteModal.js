@@ -21,7 +21,7 @@ export default function InviteModal(props) {
     }
   `,
     <div className='modal-class-invite'>
-      <input className='invite-text' value={props.room}/>
+      <input className='invite-text' readOnly={true} value={props.room}/>
       <div className='button-group-invite'>
         <button onClick={()=>{props.setShowInviteModal(0);setC(0)}}>Close</button>
         <button onClick={()=>{copy(props.room);setC(1)}}>Copy</button>

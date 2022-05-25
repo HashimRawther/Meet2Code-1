@@ -44,9 +44,13 @@ const Board=(props)=> {
                 last_mouse.x = mouse.x;
                 last_mouse.y = mouse.y;
     
-                mouse.x = e.pageX - this.offsetLeft;
-                mouse.y = e.pageY - this.offsetTop;
-
+                const sketchBox = document.getElementById('sketch');
+                const Rect = sketchBox.getBoundingClientRect();
+                const l = Rect.left;
+                const t = Rect.top;
+                
+                mouse.x = e.clientX - l;
+                mouse.y = e.clientY - t;
             }, false);
     
     
