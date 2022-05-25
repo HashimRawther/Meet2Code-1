@@ -3,3 +3,31 @@
     height:100%;
     border-radius: 1em;
 }
+
+.editorProperties{
+    width:100%;
+    height: 6%;
+    background-color:"black";
+}
+
+.tabToolBar{
+    display: flex;
+}
+
+.tabToolBar{
+    display:"inline-block";
+    cursor:"pointer";
+    float:"none";
+    color:"black";
+    border-right:"1px solid black"
+}
+
+.tabOptionDisplay{
+    width: 80px;
+    cursor: pointer;
+}
+
+#monaco-editor{
+    width: 100%;
+    height:94%;
+}
