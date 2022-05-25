@@ -1,35 +1,15 @@
 import React, { useEffect } from 'react';
 import './board.css';
+
 const Board=(props)=> {
     useEffect(()=>{
+        console.log(props.color,props.size);
         if(props.ctx===undefined) return;
         props.ctx.strokeStyle = props.color;
         props.ctx.lineWidth = props.size;
         if(props.image!==undefined && props.image.src!=="http://localhost:3000/null")
             props.ctx.drawImage(props.image,0,0);
     },[props.image,props.color,props.size,props.ctx]);
-    useEffect(()=>{
-        if(props.clear===1)
-        {
-            props.setClear(0);
-            let canvas = document.querySelector('#board');
-            props.ctx.clearRect(0,0,canvas.width,canvas.height);
-            // props.socket.emit('clear',props.room);
-            props.ctx.fillStyle = "#ffffff";
-            props.ctx.fillRect(0, 0, canvas.width, canvas.height);
-            var base64ImageData = canvas.toDataURL("image/png");
-            props.socket.emit("canvas-data",base64ImageData,props.room);
-        }
-        // else if(props.clear===2)
-        // {
-        //     props.setClear(0);
-        //     let canvas = document.querySelector('#board');
-        //     props.ctx.clearRect(0,0,canvas.width,canvas.height);
-        //     props.ctx.fillStyle = "#ffffff";
-        //     props.ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // }
-        // eslint-disable-next-line
-    },[props.clear]);
     useEffect(()=>{
         if(props.save===1)
         {
@@ -60,11 +40,13 @@ const Board=(props)=> {
     
             /* Mouse Capturing Work */
             canvas.addEventListener('mousemove', function(e) {
+                
                 last_mouse.x = mouse.x;
                 last_mouse.y = mouse.y;
     
                 mouse.x = e.pageX - this.offsetLeft;
                 mouse.y = e.pageY - this.offsetTop;
+
             }, false);
     
     
@@ -97,7 +79,7 @@ const Board=(props)=> {
     },[])
     return (  
             <div className='sketch' id='sketch'>
-            <canvas className='board' id='board'></canvas>
+                <canvas className='board' id='board'></canvas>
             </div>
         );
 }

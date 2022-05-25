@@ -14,4 +14,13 @@ const stopCanvasListeners = (socket) =>{
     socket.off("canvas-data");
 }
 
-export {updateCanvasListener,stopCanvasListeners}
+const clearCanvas = (socket,ctx,room) =>{
+    let canvas = document.getElementById('board');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    var base64ImageData = canvas.toDataURL("image/png");
+    socket.emit("canvas-data",base64ImageData,room);
+}
+
+export {updateCanvasListener,stopCanvasListeners,clearCanvas};

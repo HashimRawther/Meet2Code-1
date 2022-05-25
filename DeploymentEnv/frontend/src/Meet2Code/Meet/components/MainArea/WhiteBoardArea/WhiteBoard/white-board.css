@@ -3,17 +3,15 @@
     height:100%;
     background-color: #ac9e9e;
     color:antiquewhite;
+    border-radius: 1em;
 }
 
 .color-picker-container{
     text-align:center;
-    display:inline;
-
 }
 
 .brush-size-container{
-    display:inline;
-    margin-left: 12px;
+    text-align: center;
 }
 
 .tools-section{
@@ -21,13 +19,25 @@
     display:flex;
     align-items: center;
     justify-content: space-around;
+    height: 8%;
+    width:100%;
 }
 
 .board-container{
+    position: relative;
+    left:50%;
     width:90%;
     height:90%;
-    margin:auto;
-    margin-top:1%;
-    background:white;
+    border-radius: 1em;
+    transform: translateX(-50%);
+}
 
+#board-erase-icon{
+    height: 2em;
+    width: 2em;
+}
+
+#board-brush-icon{
+    height: 2em;
+    width: 2em;
 }

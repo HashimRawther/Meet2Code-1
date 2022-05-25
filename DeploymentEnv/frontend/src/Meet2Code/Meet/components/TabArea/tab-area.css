@@ -1,5 +1,5 @@
 .tab-area{
-    display: block;
+    display: none;
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -10,6 +10,9 @@
     width: 3em;
 }
 
+.tab-area[view="1"]{
+    display: block;
+}
 
 #code-icon{
     height: 3em;

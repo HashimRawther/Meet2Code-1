@@ -1,9 +1,24 @@
 import React from 'react';
 import './utility-area.css';
 import Style from 'style-it';
-
-
+import {savePDF} from '../../Modules/DocEditor/pdfDownloader';
+import {clearCanvas} from '../../Modules/WhiteBoard/draw';
+import {saveCanvas} from '../../Modules/WhiteBoard/canvasDownloader';
 export default function UtilityArea(props) {
+  const handleDownload=(e) =>{
+    e.preventDefault();
+    console.log(props.tabs);
+    if(props.tabs===2)
+    savePDF();
+    if(props.tabs===3)
+    saveCanvas();
+  }
+  const handleRefresh = (e) =>{
+    e.preventDefault();
+    if(props.tabs===3)
+    clearCanvas(props.socket,props.ctx,props.room);
+  }
+  
   return Style.it(`
     .utility-panel{
       background-color:${props.theme[1]};
@@ -48,7 +63,7 @@ export default function UtilityArea(props) {
       filter:${props.theme[5]};
     }
   `,
-    <div className='utility-area'>
+    <div className='utility-area' view={props.view}>
       <div className='utility-panel'>
         <button className='screen-btn' onClick={()=>{
           if(props.screenShare === 1) 
@@ -83,13 +98,13 @@ export default function UtilityArea(props) {
         <button className='end-btn'>
           <img id='end-icon' src='/icons/phone-call-end.png' alt='img'/>
         </button>
-        <button className='download-btn'>
+        <button className='download-btn' onClick={handleDownload}>
           <img id='download-icon' src='/icons/download.png' alt='img'/>
         </button>
-        <button className='clear-btn'>
+        <button className='clear-btn' onClick={handleRefresh}>
           <img id='clear-icon' src='/icons/recycle.png' alt='img'/>
         </button>
-        <button className='invite-btn'>
+        <button className='invite-btn' onClick={()=>props.setShowInviteModal(1)}>
           <img id='invite-icon' src='/icons/invite.png' alt='img'/>
         </button>
       </div>

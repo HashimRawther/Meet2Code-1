@@ -18,6 +18,7 @@ import { chatSocketListeners, chatStopListeners } from './Modules/Chat/Message';
 import { participantsListener, stopParticipantsListener } from './Modules/Participants/UsersInRoom';
 import {quillLoadDoc,quillUpdater,stopQuillListener} from './Modules/DocEditor/QuillListeners'
 import {updateCanvasListener,stopCanvasListeners} from './Modules/WhiteBoard/draw';
+import InviteModal from './components/InviteModal/InviteModal';
 let socket;
 const SAVE_INTERVAL_MS = 2000;
 const TOOLBAR_OPTIONS = [
@@ -41,6 +42,7 @@ export default function Meet(props) {
     const [screenShare, setScreenShare] = useState(0);
     const [videoState, setVideoState] = useState(0);
     const [audioState, setAudioState] = useState(0);
+    const [showInviteModal,setShowInviteModal] = useState(0);
 
 
     const { id: roomID } = useParams()
@@ -76,6 +78,9 @@ export default function Meet(props) {
         setQuill(q)
     }, []);
 
+    useEffect(()=>{
+        console.log(showInviteModal);
+    },[showInviteModal]);
     useEffect(() => {
         const handleMouseEvent = (evt) => {
             const x = evt.clientX, y = evt.clientY;
@@ -195,7 +200,7 @@ export default function Meet(props) {
         return () =>{
             stopCanvasListeners(socket);
         } 
-    })
+    },[ctx]);
 
     return Style.it(`
         .meet-app{
@@ -204,11 +209,47 @@ export default function Meet(props) {
     `,
         <div className='meet-app' view={view}>
             <div id='title-space' className='title-space'>
-                <TitleArea {...props} roomName={roomName} commTooltip={commTooltip} tabTooltip={tabTooltip} />
+                <TitleArea 
+                    {...props} 
+                    view={view} 
+                    roomName={roomName} 
+                    commTooltip={commTooltip} 
+                    tabTooltip={tabTooltip} />
             </div>
-            <div id='utilities' className='utilities'><UtilityArea {...props} screenShare={screenShare} setScreenShare={setScreenShare} videoState={videoState} setVideoState={setVideoState} audioState={audioState} setAudioState={setAudioState} /></div>
-            <div id='tab-switch' className='tab-switch'><TabArea {...props} tabs={tabs} setTabTooltip={setTabTooltip} setTabs={setTabs} /></div>
-            <div id='comm-switch' className='comm-switch'><CommSwitch {...props} setCommTooltip={setCommTooltip} tabs={tabs} setComm={setComm} comm={comm} /></div>
+            <div id='utilities' className='utilities'>
+                <UtilityArea 
+                    {...props} 
+                    view={view} 
+                    screenShare={screenShare} 
+                    tabs={tabs}
+                    socket={socket}
+                    ctx={ctx}
+                    room={room}
+                    setScreenShare={setScreenShare} 
+                    videoState={videoState} 
+                    setVideoState={setVideoState} 
+                    audioState={audioState} 
+                    setAudioState={setAudioState} 
+                    setShowInviteModal={setShowInviteModal}
+                    />
+            </div>
+            <div id='tab-switch' className='tab-switch'>
+                <TabArea 
+                    {...props} 
+                    view={view} 
+                    tabs={tabs} 
+                    setTabTooltip={setTabTooltip} 
+                    setTabs={setTabs} />
+            </div>
+            <div id='comm-switch' className='comm-switch'>
+                <CommSwitch 
+                    {...props} 
+                    view={view} 
+                    setCommTooltip={setCommTooltip} 
+                    tabs={tabs} 
+                    setComm={setComm}
+                    comm={comm} />
+            </div>
             {
                 comm !== 0 ? 
                 (<div id='app-container' className='App-container'>
@@ -263,6 +304,7 @@ export default function Meet(props) {
                         className="full-size" />
                 </div>)
             }
+            <div className='invite-modal' show={showInviteModal}><InviteModal {...props} room={room} setShowInviteModal={setShowInviteModal}/></div>
         </div>
     )
 }

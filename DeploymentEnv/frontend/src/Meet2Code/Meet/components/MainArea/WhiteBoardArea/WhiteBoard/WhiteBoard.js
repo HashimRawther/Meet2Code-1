@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import Board from '../Board/Board';
 import './white-board.css';
+import Style from 'style-it';
  
 const WhiteBoard = (props) => {
     const [brushColor,setBrushColor] = useState('#000000');
     const [color,setColor] = useState('#000000');
     const [size,setSize] = useState(5);
-    return (  
+    return Style.it(`
+        .outer-container{
+            color:${props.theme[3]};
+            background-color:${props.theme[1]};
+        }
+    `,  
         <div className='outer-container'>
             <div className='tools-section'>
                 <div className='color-picker-container'>
@@ -25,17 +31,17 @@ const WhiteBoard = (props) => {
                     </select> 
                 </div>
                 <div>
-                    <button id='erase' onClick={()=>{setBrushColor(color);setColor('#FFFFFF')}}><img src='/icons/eraser.png' alt="erase" height="40" width="40" /></button>
+                    <button id='erase' onClick={()=>{setBrushColor(color);setColor('#FFFFFF')}}><img id='board-erase-icon' src='/icons/eraser.png' alt="erase"/></button>
                 </div>
                 <div>
-                    <button onClick={()=>setColor(brushColor)}><img src='/icons/paint-brush.png' alt="brush" height="35" width="35" /></button>
+                    <button id='brush' onClick={()=>{setColor(brushColor);console.log(brushColor)}}><img id='board-brush-icon' src='/icons/paint-brush.png' alt="brush" /></button>
                 </div>
             </div>
             <div className='board-container'>
-                <Board {...props}/>
+                <Board {...props} color={color} size={size}/>
             </div>
         </div>
-    );
+    ); 
 }
  
 export default WhiteBoard;

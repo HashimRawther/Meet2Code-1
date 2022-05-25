@@ -1,5 +1,5 @@
 .utility-area{
-    display: flex;
+    display: none;
     justify-content: space-around;
     align-items: center;
     position: absolute;
@@ -8,6 +8,10 @@
     left: 4em;
     bottom:0.5em;
     height: 3em;
+}
+
+.utility-area[view="1"]{
+    display: flex;
 }
 
 .utility-panel{
