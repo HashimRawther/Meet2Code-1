@@ -1,0 +1,6 @@
+.terminal-container{
+    border-radius:1em;
+    background-color:aqua;
+    grid-row: 3/4;
+    grid-column: 2/5;
+}

@@ -77,7 +77,7 @@ export default function UtilityArea(props) {
         </button>
         <button className='cam-btn' onClick={()=>{
           props.setVideoState(!props.videoState);
-          toggleVideo(props.socket,props.myPeer);
+          toggleVideo(props.socket,props.myPeer,props.room);
         }}>
           {
             props.videoState ? <img id='cam-icon' src='/icons/video-camera.png' alt='img'/> : <img id='cam-icon' src='/icons/no-video.png' alt='img'/>
@@ -85,7 +85,7 @@ export default function UtilityArea(props) {
         </button>
         <button className='mic-btn' onClick={()=>{
           props.setAudioState(!props.audioState);
-          toggleAudio(props.socket,props.myPeer);
+          toggleAudio(props.socket,props.myPeer,props.room);
         }}>
           {
             props.audioState ? <img id='mic-icon' src='/icons/microphone.png' alt='img'/> : <img id='mic-icon' src='/icons/mute.png' alt='img'/>

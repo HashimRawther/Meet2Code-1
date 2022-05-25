@@ -15,7 +15,7 @@ export default function VideoArea(props) {
     filter:${props.theme[5]};
   }
 `,
-    <div className='video-area'>
+    <div className='video-area' id='video-comm'>
       <button onClick={()=> props.setComm(0)} id='close-video-btn' className='close-btn'><img id='close-icon' src='/icons/cancel.png' alt='img'/></button>
       <VC {...props}/>
     </div>

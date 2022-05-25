@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react'
 import './meet.css';
 import Style from 'style-it';
 import { useParams } from 'react-router-dom';
-import serverEndpoint from '../config';
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 
@@ -13,6 +12,7 @@ import TabArea from './components/TabArea/TabArea';
 import TitleArea from './components/TitleArea/TitleArea';
 import UtilityArea from './components/UtilityArea/UtilityArea';
 import InviteModal from './components/InviteModal/InviteModal';
+import serverEndpoint from '../config';
 
 import { chatSocketListeners, chatStopListeners } from './Modules/Chat/Message';
 import { participantsListener, stopParticipantsListener } from './Modules/Participants/UsersInRoom';
@@ -45,7 +45,7 @@ export default function Meet(props) {
     const [videoState, setVideoState] = useState(true);
     const [audioState, setAudioState] = useState(true);
     const [showInviteModal,setShowInviteModal] = useState(0);
-
+    const [videoGrid,setVideoGrid] = useState();
 
     const { id: roomID } = useParams()
     const [name, setName] = useState('');
@@ -60,9 +60,8 @@ export default function Meet(props) {
     const [roomName, setRoomName] = useState();
     const [clear, setClear] = useState(0);
     const [save, setSave] = useState(0);
-    const ENDPOINT = serverEndpoint;
-    // let [question, setQuestion] = useState(undefined);
-    // let [questionText, setQuestionText] = useState("");
+    let [question, setQuestion] = useState(undefined);
+    let [questionText, setQuestionText] = useState("");
 
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
@@ -130,13 +129,12 @@ export default function Meet(props) {
         }
     }, []);
 
-
     useEffect(() => {
-        
+        console.log('joining');
         myPeer = CreatePeer();
+        setRoom(roomID);
         let name = props.user.login;
         setName(name)
-        setRoom(roomID);
         let user = props.user;
         props.socket.emit('join', { roomID, user }, (roomName) => {
             setRoomName(roomName);
@@ -144,7 +142,7 @@ export default function Meet(props) {
         return () => {
             props.socket.off();
         }
-    }, [ENDPOINT, roomID, props.user, props.socket]);
+    }, [roomID,props.user,props.socket]);
 
     useEffect(() => {
         chatSocketListeners(props.socket, setMessages, messages);
@@ -194,6 +192,19 @@ export default function Meet(props) {
             stopCanvasListeners(props.socket);
         } 
     },[ctx, props.socket]);
+    useEffect(() => {
+
+        let api_fetch = async () => {
+            let ENDPOINT = serverEndpoint
+            let resp = await fetch(ENDPOINT + '/getProblem?contest=' + question['contestId'] + '&id=' + question['index']);
+            resp = await resp.text();
+            setQuestionText(resp)
+        }
+
+        if (question !== undefined)
+            api_fetch()
+
+    }, [question])
 
     return Style.it(`
         .meet-app{
@@ -256,14 +267,20 @@ export default function Meet(props) {
                         setSave={setSave} 
                         clear={clear} 
                         setClear={setClear} 
-                        room={room} 
+                        room={room}
+                        name={name} 
+                        myPeer={myPeer}
                         image={image} 
                         ctx={ctx} 
                         setctx={setctx} 
                         timeout={timeout} 
                         settimeOut={settimeOut} 
                         wrapperRef={wrapperRef} 
-                        tabs={tabs} 
+                        tabs={tabs}
+                        question={question}
+                        questionText={questionText}
+                        setQuestion={setQuestion}
+                        setQuestionText={setQuestionText}
                         className="half-size" 
                     /> 
                     <CommunicationArea 

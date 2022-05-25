@@ -1,6 +1,7 @@
 import React from 'react';
 import './video-grid.css';
 import Style from 'style-it';
+import VC from '../../CommunicationArea/VideoArea/VideoCall/vc-component';
 
 export default function VideoGrid(props) {
   return Style.it(`
@@ -8,8 +9,8 @@ export default function VideoGrid(props) {
     background-color: ${props.theme[1]};
   }
 `,
-    <div className='video-grid'>
-      
+    <div className='video-grid' id='video-panel'>
+      <VC {...props}/>
     </div>
   )
 }

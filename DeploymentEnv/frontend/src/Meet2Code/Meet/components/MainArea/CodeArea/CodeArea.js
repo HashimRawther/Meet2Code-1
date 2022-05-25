@@ -10,6 +10,9 @@ import { useParams } from "react-router-dom";
 
 import './code-area.css';
 import Style from 'style-it';
+import CodeEditor from './CodeEditor/CodeEditor';
+import Terminal from './Terminal/Terminal';
+import Question from './Questions/Question';
 
 const monacoThemeList = ["vs", "vs-dark", "hc-black"]
 let editor
@@ -161,8 +164,9 @@ export default function CodeArea(props) {
     }
   `,
     <div className='code-area'>
-        <div id="monaco-editor">
-        </div>
+      <CodeEditor {...props}/>
+      <Question {...props}/>
+      <Terminal {...props}/>
     </div>
   )
 }

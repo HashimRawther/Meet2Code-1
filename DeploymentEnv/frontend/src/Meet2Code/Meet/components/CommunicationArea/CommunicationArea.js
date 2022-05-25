@@ -9,6 +9,16 @@ import VideoArea from './VideoArea/VideoArea';
 import {sendMessage} from '../../Modules/Chat/Message';
 
 export default function CommunicationArea(props) {
+  const handleCollapse = () =>{
+    props.setTabs(props.prevTab)
+  }
+  const handleExpand = () =>{
+    props.setPrevTab(props.tabs);
+    // props.setComm(3);
+    // props.setVideoGrid(document.getElementById('video-grid'));
+    props.setComm(1);
+    props.setTabs(0);
+  }
   return Style.it(`
   .communication-area{
     background-color: ${props.theme[1]};
@@ -32,11 +42,8 @@ export default function CommunicationArea(props) {
       }
       <div className='expand-btn-area'>
         {
-          props.tabs !== 0 ? (<button className='enlarge-btn' onClick={()=>{
-            props.setPrevTab(props.tabs);
-            props.setComm(1);
-            props.setTabs(0);
-          }}><img id='left-arrow-icon' src='/icons/left-arrow.png' alt='img'/></button>) : (<button className='collapse-btn' onClick={()=>props.setTabs(props.prevTab)}><img id='right-arrow-icon' src='/icons/right-arrow.png' alt='img'/></button>)
+          props.tabs !== 0 ? (<button className='enlarge-btn' onClick={()=>{handleExpand();}}><img id='left-arrow-icon' src='/icons/left-arrow.png' alt='img'/></button>) 
+          : (<button className='collapse-btn' onClick={()=>handleCollapse()}><img id='right-arrow-icon' src='/icons/right-arrow.png' alt='img'/></button>)
         }
       </div>
     </div>
