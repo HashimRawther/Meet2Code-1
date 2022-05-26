@@ -63,6 +63,7 @@ export default function MainPage(props) {
                 setShow(true);
             }
         })
+        // eslint-disable-next-line
     },[socket]);
 
 	useEffect(()=>{

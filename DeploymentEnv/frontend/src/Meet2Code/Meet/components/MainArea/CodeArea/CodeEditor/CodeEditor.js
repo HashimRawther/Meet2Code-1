@@ -9,7 +9,7 @@ import * as monaco from 'monaco-editor'
 import serverEndpoint from '../../../../../config';
 import Style from 'style-it';
 
-const monacoThemeList = ["vs", "vs-dark", "hc-black"]
+// const monacoThemeList = ["vs", "vs-dark", "hc-black"]
 let editor;
 
 export default function CodeEditor(props) {
@@ -55,7 +55,7 @@ export default function CodeEditor(props) {
         return ()=>{
             monaco.editor.getModels().forEach(model => model.dispose());
         }
-      },[props.roomId, props.currentTab, props.codeTabs])
+      },[props.roomId, props.currentTab, props.codeTabs,props.room])
       useEffect(()=>{
 
         let api_fetch = async () => {
@@ -66,7 +66,7 @@ export default function CodeEditor(props) {
         }
   
         api_fetch()
-  
+        // eslint-disable-next-line
     },[props.tag]);
   
     //Change the current tab to point to tabId

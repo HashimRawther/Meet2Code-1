@@ -18,7 +18,9 @@ export default function Question(props) {
   },[props.questionText]);
 
   return Style.it(`
-    
+    .question-container img{
+      filter:${props.theme[6]};
+    }
   `,
     <div className='question-container'>
     </div>

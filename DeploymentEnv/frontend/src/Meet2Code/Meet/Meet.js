@@ -21,8 +21,11 @@ import {updateCanvasListener,stopCanvasListeners} from './Modules/WhiteBoard/dra
 import {leaveMeet} from './Modules/LeaveRoom/LeaveRoom';
 import {CreatePeer} from './Modules/VideoCall/peer-init';
 
+import {renderer} from './Modules/VideoCall/vc';
+
 let myPeer;
 const SAVE_INTERVAL_MS = 2000;
+const videoGrid = document.createElement('div');
 const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     [{ font: [] }],
@@ -45,7 +48,7 @@ export default function Meet(props) {
     const [videoState, setVideoState] = useState(true);
     const [audioState, setAudioState] = useState(true);
     const [showInviteModal,setShowInviteModal] = useState(0);
-    const [videoGrid,setVideoGrid] = useState();
+    
 
     const { id: roomID } = useParams()
     const [name, setName] = useState('');
@@ -79,37 +82,8 @@ export default function Meet(props) {
           'theme' : 'vs-dark',
           'language' : 'javascript',
           'question' : undefined
-        },
-        {
-          'theme' : 'vs-dark',
-          'language' : 'javascript',
-          'question' : undefined
-        },
-        {
-          'theme' : 'vs-dark',
-          'language' : 'javascript',
-          'question' : undefined
-        },
-        {
-          'theme' : 'vs-dark',
-          'language' : 'javascript',
-          'question' : undefined
-        },
-        {
-          'theme' : 'vs-dark',
-          'language' : 'javascript',
-          'question' : undefined
-        },
-        {
-          'theme' : 'vs-dark',
-          'language' : 'javascript',
-          'question' : undefined
-        },
-        {
-          'theme' : 'vs-dark',
-          'language' : 'javascript',
-          'question' : undefined
         }
+        
     ]);
     let [tabLen, setTablen] = useState(4);
     let [currentTab, setCurrentTab] = useState(0);
@@ -130,6 +104,8 @@ export default function Meet(props) {
         q.setText("Loading...")
         setQuill(q)
     }, []);
+
+    
 
     useEffect(() => {
         const handleMouseEvent = (evt) => {
@@ -259,6 +235,18 @@ export default function Meet(props) {
 
     }, [question])
 
+    useEffect(()=>{
+        videoGrid.setAttribute('id','video-grid');
+    },[])
+    useEffect(()=>{
+        while(myPeer === undefined || myPeer === null);
+        if(myPeer !== undefined && myPeer !== null && props.socket!==undefined && props.socket !== null)
+        {
+            console.log('hi');
+            renderer(props.socket,myPeer, room, name,tabs,videoGrid)
+        }
+    },[props.socket, room, name, tabs]);
+
     return Style.it(`
         .meet-app{
             background-color:${props.theme[0]};
@@ -360,7 +348,8 @@ export default function Meet(props) {
                         comm={comm} tabs={tabs} 
                         setComm={setComm} 
                         setTabs={setTabs}
-                        myPeer={myPeer} 
+                        myPeer={myPeer}
+                        videoGrid={videoGrid} 
                     />
                 </div>) : 
                 (<div id='app-container' className='App-container'>

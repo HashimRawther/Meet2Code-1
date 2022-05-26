@@ -57,6 +57,7 @@ export default function Terminal(props) {
 }
 
 const runCode = async() => {
+    document.getElementById("code-output").value = '';
     const code = JSON.stringify(returnData())
     let contestId = props.question['contestId'], questionId = props.question['index']
     if(contestId === undefined && questionId === undefined)
@@ -68,8 +69,10 @@ const runCode = async() => {
     testCases = await testCases.json();
     let passedtc = 0
 
+
     for (let index in testCases) {
         let res = await createSubmisssion(testCases[index].input, testCases[index].output, code)
+
         if(res!==undefined && res['status']['description']==='Accepted')
         {
             passedtc+=1
@@ -78,14 +81,12 @@ const runCode = async() => {
     console.log("PAssed: "+passedtc)
 }
 
-const executeCode = async () => {
+const executeCode = async() => {
+    document.getElementById("code-output").value = ''
     let bout = ''
     const userInput = document.getElementById("user-input").value
     const code = JSON.stringify(returnData())
-    // const code = editor.getValue()
-    // console.log(editor)
 
-    // console.log(code)
     let res = await createSubmisssion(userInput, null, code)
     console.log(res);
     if (res["stdout"] == null) {
@@ -103,6 +104,27 @@ const executeCode = async () => {
     .terminal-container{
       background-color:${props.theme[2]};
     }
+    #user-input{
+      color:${props.theme[3]};
+      border: 1px solid ${props.theme[4]};
+    }
+    #user-input::placeholder{
+      color:${props.theme[4]};
+    }
+    #code-output{
+      color:${props.theme[3]};
+      border: 1px solid ${props.theme[4]};
+    }
+    #code-output::placeholder{
+      color:${props.theme[4]};
+    }
+    .user-console{
+      color:${props.theme[3]};
+    }
+    .button-space button{
+      background-color:${props.theme[4]};
+      color:${props.theme[3]};
+    }
   `,
     <div className='terminal-container'>
       <div className='user-console'>
@@ -118,8 +140,8 @@ const executeCode = async () => {
         </div>
       </div>
       <div className='button-space'>
-        <button style={{ 'background-color': "black", color: "white" }} onClick={executeCode}>Test</button>
-        <button style={{ 'background-color': "white", color: "black" }} onClick={runCode}>Submit</button>
+        <button onClick={executeCode}>Test</button>
+        <button onClick={runCode}>Submit</button>
       </div>
     </div>
   )
