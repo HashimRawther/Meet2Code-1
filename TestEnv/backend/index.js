@@ -364,7 +364,7 @@ io.on('connection',(socket)=>{
 
     })
 
-    socket.on('joinContest', async(arg, callback)=>{
+    socket.on('joinContest', async(arg, redirect)=>{
         
         socket.join(`${arg.contestId}`);    //Join the contest room
         let contest = await Contest.findById(arg.id);
@@ -374,6 +374,10 @@ io.on('connection',(socket)=>{
         });
 
         contest = await contest.save();
+        if(contest['status'] === 'running')
+        {
+            redirect("Already Joined",202);
+        }
 
     })
 });
@@ -501,6 +505,19 @@ app.get('/contestsSize', async(req,res)=>{
     catch(e)
     {
 
+    }
+});
+
+app.get('/contest/:id', async(req,res) => {
+
+    let contestId = req.params.id
+    try{
+        let contest = await Contest.findOne({contestId : contestId});
+        res.json(contest);
+    }
+    catch(e)
+    {
+        console.log(e);
     }
 })
 

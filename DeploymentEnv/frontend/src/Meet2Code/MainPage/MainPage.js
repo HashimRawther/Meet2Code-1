@@ -86,7 +86,7 @@ export default function MainPage(props) {
         //Get the list of questions from backend
         let api_fetch = async () => {
 
-            let questions = await fetch(serverEndpoint + '/codeforces/questions?tags=implementation');
+            let questions = await fetch(serverEndpoint + '/codeforces/questions?tags=2-sat');
             questions = await questions.json();
             setModalQuestions(questions['questions']['result']['problems']);
             console.log(questions['questions']['result']['problems'])
@@ -291,7 +291,15 @@ export default function MainPage(props) {
 
     let joinContest = (contest_id, db_id) => {
 
-        socket.emit('joinContest',{contestId : contest_id, user : props.user, id : db_id})
+        socket.emit('joinContest',{contestId : contest_id, user : props.user, id : db_id},(status, code) => {
+
+            if(code === 202 && status === 'running')
+            {
+                navigate('/contest/' + contest_id);
+            }
+
+        });
+
     }
 
     //Modal for creating a contest
@@ -650,7 +658,6 @@ export default function MainPage(props) {
                         <div className='contestListDisplay'>
                             {
                                 contestList.map((contest,index) => {
-                                    console.log(contest)
                                     return <div key={index} className='contestListDisplayItem'>
                                                 {contest['name']}
                                                 <button style={{marginLeft:"10px", marginRight:"10px", width:"30%"}}

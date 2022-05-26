@@ -15,7 +15,6 @@ import Login from './OAuth/Login';
 import MainPage from './MainPage/MainPage';
 import Room from './Room/Room';
 import Contest from './Contest/Contest';
-import io from 'socket.io-client';
 let socket;
 export default function Main() {
     
