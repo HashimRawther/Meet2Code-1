@@ -79,6 +79,7 @@ const runCode = async() => {
         }
     }
     console.log("PAssed: "+passedtc)
+    window.alert("Passed " + passedtc+ " test cases :)")
 }
 
 const executeCode = async() => {
