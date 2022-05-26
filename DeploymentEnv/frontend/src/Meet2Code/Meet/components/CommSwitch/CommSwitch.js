@@ -35,7 +35,7 @@ export default function CommSwitch(props) {
       filter:${props.theme[5]};
     }
   `,
-    <div className='comm-switch-box'>
+    <div className='comm-switch-box' view={props.view}>
       <button comm={props.comm} onClick={()=>props.setComm(1)} onMouseEnter={()=>props.setCommTooltip(1)} onMouseLeave={()=>props.setCommTooltip(0)} className='chat-btn'>
         <img id='chat-icon' src='/icons/speech-bubble.png' alt='img'/>
       </button>

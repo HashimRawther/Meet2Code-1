@@ -47,7 +47,7 @@ export default function TabArea(props) {
       filter:${props.theme[5]};
     }
   `,
-    <div className='tab-area'>
+    <div className='tab-area' view={props.view}>
       <button tabs={props.tabs} onClick={()=>props.setTabs(1)} onMouseEnter={()=>props.setTabTooltip(1)} onMouseLeave={()=>props.setTabTooltip(0)} className='code-btn'>
         <img id='code-icon' src='/icons/code.png' alt='img'/>
       </button>

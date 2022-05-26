@@ -1,9 +1,24 @@
 import React from 'react';
 import './utility-area.css';
 import Style from 'style-it';
-
-
+import {savePDF} from '../../Modules/DocEditor/pdfDownloader';
+import {clearCanvas} from '../../Modules/WhiteBoard/draw';
+import {saveCanvas} from '../../Modules/WhiteBoard/canvasDownloader';
+import {toggleAudio,toggleVideo} from '../../Modules/VideoCall/vc';
 export default function UtilityArea(props) {
+  const handleDownload=(e) =>{
+    e.preventDefault();
+    if(props.tabs===2)
+    savePDF();
+    if(props.tabs===3)
+    saveCanvas();
+  }
+  const handleRefresh = (e) =>{
+    e.preventDefault();
+    if(props.tabs===3)
+    clearCanvas(props.socket,props.ctx,props.room);
+  }
+  
   return Style.it(`
     .utility-panel{
       background-color:${props.theme[1]};
@@ -48,7 +63,7 @@ export default function UtilityArea(props) {
       filter:${props.theme[5]};
     }
   `,
-    <div className='utility-area'>
+    <div className='utility-area' view={props.view}>
       <div className='utility-panel'>
         <button className='screen-btn' onClick={()=>{
           if(props.screenShare === 1) 
@@ -61,35 +76,31 @@ export default function UtilityArea(props) {
           }
         </button>
         <button className='cam-btn' onClick={()=>{
-          if(props.videoState === 1) 
-            props.setVideoState(0);
-          else 
-            props.setVideoState(1);
+          props.setVideoState(!props.videoState);
+          toggleVideo(props.socket,props.myPeer,props.room);
         }}>
           {
-            props.videoState === 1 ? <img id='cam-icon' src='/icons/video-camera.png' alt='img'/> : <img id='cam-icon' src='/icons/no-video.png' alt='img'/>
+            props.videoState ? <img id='cam-icon' src='/icons/video-camera.png' alt='img'/> : <img id='cam-icon' src='/icons/no-video.png' alt='img'/>
           }
         </button>
         <button className='mic-btn' onClick={()=>{
-          if(props.audioState === 1) 
-            props.setAudioState(0);
-          else 
-            props.setAudioState(1);
+          props.setAudioState(!props.audioState);
+          toggleAudio(props.socket,props.myPeer,props.room);
         }}>
           {
-            props.audioState === 1 ? <img id='mic-icon' src='/icons/microphone.png' alt='img'/> : <img id='mic-icon' src='/icons/mute.png' alt='img'/>
+            props.audioState ? <img id='mic-icon' src='/icons/microphone.png' alt='img'/> : <img id='mic-icon' src='/icons/mute.png' alt='img'/>
           }
         </button>
-        <button className='end-btn'>
+        <button className='end-btn' onClick={(e)=>props.leaveMeet(e,props.socket,props.user._id)}>
           <img id='end-icon' src='/icons/phone-call-end.png' alt='img'/>
         </button>
-        <button className='download-btn'>
+        <button className='download-btn' onClick={handleDownload}>
           <img id='download-icon' src='/icons/download.png' alt='img'/>
         </button>
-        <button className='clear-btn'>
+        <button className='clear-btn' onClick={handleRefresh}>
           <img id='clear-icon' src='/icons/recycle.png' alt='img'/>
         </button>
-        <button className='invite-btn'>
+        <button className='invite-btn' onClick={()=>props.setShowInviteModal(1)}>
           <img id='invite-icon' src='/icons/invite.png' alt='img'/>
         </button>
       </div>

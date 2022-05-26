@@ -51,7 +51,6 @@ const Room=(props)=>{
            :
            <div className="generated-room">
                 {topbar.hide()}
-                {console.log(props)}
                 <Meet {...props}/>
            </div>
            }

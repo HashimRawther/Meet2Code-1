@@ -1,5 +1,5 @@
 .comm-switch-box{
-    display: block;
+    display: none;
     justify-content: center;
     align-items: center;
     position: absolute;
@@ -10,6 +10,9 @@
     width: 3em;
 }
 
+.comm-switch-box[view="1"]{
+    display: block;
+}
 #chat-icon{
     height: 3em;
     width: 3em;
