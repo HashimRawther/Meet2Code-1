@@ -1,6 +1,7 @@
 import React from 'react';
 import './participant-area.css';
 import Style from 'style-it';
+import Participant from './Participants/Participant';
 
 
 export default function ParticipantArea(props) {
@@ -17,6 +18,7 @@ export default function ParticipantArea(props) {
 `,
     <div className='participant-area'>
       <button onClick={()=> props.setComm(0)} id='close-participant-btn' className='close-btn'><img id='close-icon' src='/icons/cancel.png' alt='img'/></button>
+      <Participant {...props}/>
     </div>
   )
 }

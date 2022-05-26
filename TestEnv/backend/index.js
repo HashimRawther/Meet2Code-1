@@ -17,6 +17,7 @@ const Contest = require('./Schemas/Contest');
 const { serverEndPoint } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
+// const {ExpressPeerServer} = require('peer');
 
 const Document = require("./Schemas/Document")
 const Peer = require('./Schemas/peerinfos')
@@ -24,6 +25,8 @@ const PORT = process.env.PORT || 9000;
 
 const router = require('./Routers/router');
 const cron = require('node-cron');
+
+
 
 app.use(router);
 app.use(cors({credentials:true, origin:["http://localhost:3000"]}));
@@ -69,7 +72,6 @@ let isLoggedin=(req,res,next)=>{
 
 //Check if the user is not already logged in
 let notLoggedin=(req,res,next)=>{
-    // console.log(req.session)
     if(req.session.loggedin==undefined || req.session.loggedin==null)
         next();
     else
@@ -83,11 +85,12 @@ const io = socket(server,{cors: {
     }
 });
 
+
 const defaultValue = ""
 
 io.on('connection',(socket)=>{
 
-    socket.on('audio-toggle-sender', (userId, astatus) => {
+    socket.on('audio-toggle-sender', (userId, astatus,roomId) => {
 		Peer.updateOne({peerid: userId}, {
 			audioStatus: astatus, 
 		}, function(err, numberAffected, rawResponse) {
@@ -96,7 +99,7 @@ io.on('connection',(socket)=>{
 		socket.broadcast.to(roomId).emit('audio-toggle-receiver', {userId: userId, audioStatus: astatus})
 	})
 
-	socket.on('video-toggle-sender', (userId, vstatus) => {
+	socket.on('video-toggle-sender', (userId, vstatus,roomId) => {
 		Peer.updateOne({peerid: userId}, {
 			videoStatus: vstatus, 
 		}, function(err, numberAffected, rawResponse) {
@@ -105,24 +108,21 @@ io.on('connection',(socket)=>{
 		socket.broadcast.to(roomId).emit('video-toggle-receiver', {userId: userId, videoStatus: vstatus})
 	})
 
-	socket.on('peer-track-sender', ()=>{
+	socket.on('peer-track-sender', (roomId)=>{
 
 		Peer.find({roomid: roomId}, {'_id': 0, 'username': 1, 'peerid': 1, 'audioStatus': 1, 'videoStatus': 1})
 		.then((mediaRes)=>{
 
 			let res = mediaRes.map((x)=>x.peerid)
-			// console.log('peerTrack'+res) 
-			// console.log('medias'+mediaRes)
 			socket.broadcast.to(roomId).emit('peer-track-receiver', res, mediaRes)     
 		})
 	})
 
 	socket.on('join-room', (uname, room_id, userId, astatus, vstatus) => {
-		roomId = room_id
+		let roomId = room_id
 		socket.join(roomId)
 		socket.broadcast.to(roomId).emit('user-connected', userId)
 		// peers.push(userId)
-		// console.log('username:;'+ uname)
 		const peer = new Peer({
 			username: uname,
 			roomid: roomId,
@@ -131,13 +131,11 @@ io.on('connection',(socket)=>{
 			videoStatus: vstatus
 		})
 		peer.save()
-		.then((res)=>console.log(res))
+		.then((res)=>console.log('Peer saved'))
 		.catch(err=>console.log(err))
 
 		socket.on('disconnect', () => {
 
-		// console.log("socket disc")
-		// console.log(userId)
 		socket.broadcast.to(roomId).emit('user-disconnected', userId)
 		Peer.deleteOne({peerid: userId}, function (err) {
 			if (err) return handleError(err);
@@ -173,7 +171,6 @@ io.on('connection',(socket)=>{
             user['room']=room._id
             user['socketId']=socket.id
             await user.save()
-            // console.log(room);
             redirect(roomId,200);   //Created Successfully redirect with 200
         }
         catch(e){
@@ -183,9 +180,10 @@ io.on('connection',(socket)=>{
     })
     //Join an existing room
     socket.on('joinRoom',async(arg,redirect)=>{
+        
         try{
             let room=await Room.findOne({roomId: arg.id}) //Get the room details
-            console.log(room, arg.id);
+            
             if(room===undefined || room===null){    //Room doesn't exist
                 redirect(undefined,404)
                 return
@@ -231,11 +229,9 @@ io.on('connection',(socket)=>{
 
             if(room!==undefined && room!==null){
                 //Delete the room if the host has ended the meeting
-                // console.log(room['host'],mongoose.Types.ObjecId(arg.host))
                 io.to(room['roomId']).emit('message',{user:'',text:`${user['login']}, has left`});
                 io.to(room['roomId']).emit('userLeft', {user: user});
                 if(room['host']==(arg.host)){
-                    // console.log(room['host'],mongoose.Types.ObjecId(arg.host))
                     //Emit an end room event to all participants of the room 
                     // socket.to(room['roomId']).emit('endRoom')
                     await Room.findByIdAndDelete(room._id)
@@ -244,7 +240,6 @@ io.on('connection',(socket)=>{
                 //Remove the participant from the room
                 else{
                     room['participants'].splice(room['participants'].indexOf(user._id),1);
-                    // console.log(room);
                     await room.save();
                 }
                 //Remove the room from the user
@@ -272,7 +267,6 @@ io.on('connection',(socket)=>{
         try{
             let room=arg.roomID;
             let name=arg.user.login;
-            console.log(room);
             let userRoom=await Room.findOne({roomId: room}) //Get the room details
             if(userRoom===undefined || userRoom===null){    //Room doesn't exist
                 // redirect(undefined,404)
@@ -302,7 +296,6 @@ io.on('connection',(socket)=>{
         io.to(room).emit('canvas-data',data);
     });
     socket.on('sendMessage',(message,id,name,room,callback)=>{
-        console.log(message,room);
         io.to(room).emit('message',{id:id,user:name,text:message});
         callback();
     })
@@ -423,14 +416,12 @@ app.get('/getProblem/', async(req, res)=>{
 
     let {contest, id} = req.query
     try{
-
-        console.log(contest, id)
         let response = await fetch("https://www.codeforces.com/problemset/problem/"+contest+"/"+id);
         response = await response.text();
 
         let doc = cheerio.load(response);
-        let htmlResponse = doc('.problem-statement').text();
-        res.send(htmlResponse);
+        let html = doc('.problem-statement').html();
+        res.send(html);
     }
     catch(exception)
     {
