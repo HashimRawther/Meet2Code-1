@@ -158,6 +158,7 @@ export default function CodeEditor(props) {
             cursor:pointer;
         }
         .question-picker{
+            
             background-color:${props.theme[2]};
             color:${props.theme[3]};  
         }
