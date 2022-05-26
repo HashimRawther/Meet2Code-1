@@ -7,10 +7,14 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
+import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
+
 
 import Login from './OAuth/Login';
 import MainPage from './MainPage/MainPage';
 import Room from './Room/Room';
+import Contest from './Contest/Contest';
 export default function Main() {
     
     //['background-color', 'window-color', 'icon-color','text-color','selected-item-color/secondary-text-color','black to icon-color filter']
@@ -27,10 +31,11 @@ export default function Main() {
     let [user,setUser]=useState({});
     let [loggedin,setLoggedin]=useState(false);
     let [loading,setLoading]=useState(true);
-    
+    let [socket,setSocket] = useState(io(`${serverEndpoint}`));
+
     useEffect(()=>{
-        getInfo()
-    },[])
+        getInfo();
+    },[]);
     
     async function getInfo(){
         let loginfo=await fetch(`${serverEndpoint}/oauth/isloggedin`,{
@@ -68,10 +73,10 @@ export default function Main() {
             return <div></div>
 
         if(loggedin===false){
-            return <Login theme={theme} setTheme={setTheme}></Login>
+            return <Login socket={socket} theme={theme} setTheme={setTheme}></Login>
         }
         else{
-            return  <MainPage theme={theme} setTheme={setTheme} user={user} loggedin={loggedin} logOutUser={logOutUser}></MainPage>
+            return  <MainPage socket={socket} theme={theme} setTheme={setTheme} user={user} loggedin={loggedin} logOutUser={logOutUser}></MainPage>
         }
     }
 
@@ -82,7 +87,13 @@ export default function Main() {
                     <Route path='/' element={renderHome()}/>
                          
                     <Route path='/room/:id' element={
-                        <Room theme={theme} setTheme={setTheme} user={{...user}}></Room>}/>
+                        <Room socket={socket} theme={theme} setTheme={setTheme} user={{...user}}></Room>
+                    }/>
+
+                    <Route path='/contest/:id' element={
+                        <Contest socket={socket} theme={theme} setTheme={setTheme} user={{...user}}></Contest>
+                    } />
+
                 </Routes>
             </BrowserRouter>
         </div>

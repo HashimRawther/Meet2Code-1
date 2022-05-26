@@ -6,6 +6,7 @@
 .main-page-wrapper{
     width: 100%;
     height: 100%;
+    overflow-y: auto;
 }
 
 .home-page-topbar{
@@ -341,7 +342,6 @@
     flex-wrap: wrap;
     justify-content: space-around;
     padding-top: 3em;
-    align-items: center;
 }
 
 .publicRoomComponent{
@@ -350,6 +350,7 @@
     padding: 25px;
     height: calc(100% + 4rem);
     align-items: center;
+    margin-top: 30px;
 }
 
 .publicRoomComponent :hover{
@@ -370,3 +371,146 @@
     border-radius: 2em;
 }
 
+.contest-helper-ui{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-top: 3em;
+    
+}
+
+.create-contest{
+    margin-left: 20px;
+    margin-right: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: white;
+    text-align: center;
+}
+
+/*modal screen css content start*/
+.modalContest {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.90);
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(1.1);
+    transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
+}
+
+.modal-content-create-contest{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 1rem 1.5rem;
+    width: 24rem;
+    height: 50%;
+    border-radius: 0.5rem;
+    overflow-y: scroll;
+}
+
+.close-button {
+    float: right;
+    width: 1.5rem;
+    line-height: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 0.25rem;
+    background-color: lightgray;
+}
+
+.close-button:hover {
+    background-color: darkgray;
+}
+
+.show-modal {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1.0);
+    transition: visibility 0s linear 0s, opacity 0.25s 0s, transform 0.25s;
+}
+
+.contest-question-picker{
+    display: flex;
+}
+
+
+.dropdown {
+    display: inline-block;
+    position: relative;
+    max-width: 110%;
+    max-height: 100%;
+    font-size: large;
+  }
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    overflow: auto;
+    box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.4);
+  }
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  .dropdown-content select option {
+    display: block;
+    color: white;
+    padding: 5px;
+    text-decoration: none;
+  }
+  .dropdown-content select option:hover {
+    color: #FFFFFF;
+    background-color: #00A4BD;
+  }
+
+.questionOption{
+    margin-top: 10px;
+}
+
+.contestTimePicker{
+    margin-top: 20px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.contestStartNotification
+{
+    width: 100%;
+    visibility: hidden;
+    background-color: #14903F;
+    color: white;
+    font-weight: bold;
+    font-size: large;
+    text-align: center;
+    align-items: center;
+}
+
+.contestStartNotificationOn{
+    height : 4%;
+    visibility: visible;
+}
+
+.contestListDisplay{
+    color: white;
+}
+
+#joinModal{
+    width: 110%;
+}
+
+.contestListDisplayItem{
+
+    margin: 10px;
+}
+
+/*modal screen css content create finish*/

@@ -13,6 +13,8 @@ const session = require("express-session");
 const mongoose = require("mongoose");
 const Room=require('./Schemas/room');
 const User=require('./Schemas/user');
+const Contest = require('./Schemas/Contest');
+const { serverEndPoint } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
 
@@ -21,6 +23,7 @@ const Peer = require('./Schemas/peerinfos')
 const PORT = process.env.PORT || 9000;
 
 const router = require('./Routers/router');
+const cron = require('node-cron');
 
 app.use(router);
 app.use(cors({credentials:true, origin:["http://localhost:3000"]}));
@@ -317,6 +320,69 @@ io.on('connection',(socket)=>{
             await Document.findByIdAndUpdate(documentId, { data })
         })
     })
+
+    //Contest related socket listeners and emitter
+    socket.on("createContest", async (arg, callback) => {
+
+        let contestId = uuid();
+        socket.join(`${contestId}`);
+        try{
+            //Get the details of user who emitted the event
+            //Create room with the arguments sent along with the newly created roomId
+            let contest=new Contest({
+                contestId : contestId,
+                startTime : arg.startTime,
+                host : arg.host,
+                name :  arg.name,
+                questions : arg.questions
+            });
+            contest=await contest.save()
+            console.log(arg.startTime)
+            
+            //Run a cron job for starting and ending contests
+            let job = cron.schedule('* * * * *', async() => {
+                let curDateTime = new Date().getTime();
+                let startTimeSeconds = new Date(arg.startTime).getTime();
+                try
+                {
+                    if(curDateTime >= startTimeSeconds)
+                    {
+                        let curContest = await Contest.findById(contest._id);
+                        if(curContest['status'] === 'not started')
+                        {
+                            curContest['status'] = 'running';
+                            curContest = await curContest.save();
+
+                            io.to(contestId).emit('contestStarted',{contest: curContest['name'], contestId : curContest['contestId'], contest_db_id : curContest._id});
+                        }
+                    }
+                }
+                catch(e)
+                {
+                    console.log(e)
+                }
+
+            });
+            job.start();
+        }
+        catch(e){
+            console.log(e);
+        }
+
+    })
+
+    socket.on('joinContest', async(arg, callback)=>{
+        
+        socket.join(`${arg.contestId}`);    //Join the contest room
+        let contest = await Contest.findById(arg.id);
+        contest.participants.push({
+            participant : arg.user._id,
+            score : 0
+        });
+
+        contest = await contest.save();
+
+    })
 });
 
 async function getParticipants(roomId){
@@ -332,7 +398,6 @@ async function getParticipants(roomId){
             user=await User.findById(participants[i]);
             users.push(user);
         }
-        // console.log(users);
         return users;
     }
     catch(e)
@@ -365,8 +430,6 @@ app.get('/getProblem/', async(req, res)=>{
 
         let doc = cheerio.load(response);
         let htmlResponse = doc('.problem-statement').text();
-        console.log(htmlResponse);
-
         res.send(htmlResponse);
     }
     catch(exception)
@@ -423,6 +486,31 @@ app.get('/publicRooms', async(req,res) => {
     // fetch name, desc, host, creation time, number of participants, profile photos of first four people and link to join the room.
     res.json(response);    
 
+});
+
+app.get('/getContests',async(req,res)=>{
+
+    try{
+        let contests = await Contest.find();
+        res.json(contests);
+    }
+    catch(e)
+    {
+        console.log(e);
+    }
+
+});
+
+app.get('/contestsSize', async(req,res)=>{
+    try{
+        let count = await Contest.countDocuments();
+        console.log(count);
+        res.json({count})
+    }
+    catch(e)
+    {
+
+    }
 })
 
 server.listen(PORT,()=>{

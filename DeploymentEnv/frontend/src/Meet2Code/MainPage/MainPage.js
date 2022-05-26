@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import serverEndpoint from '../config';
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
+import DateTimePicker from 'react-datetime-picker';
 
 export default function MainPage(props) {
 
@@ -14,10 +15,56 @@ export default function MainPage(props) {
 	let [joinShow,setJoinShow]=useState(false);
 	let [createShow,setCreateShow]=useState(false);
     let [publicRooms, setPublicRooms] = useState([]);
+    let [questions, setModalQuestions] = useState([]);
+    let [contestTime, setContestTime] = useState(new Date()); 
+    let [show,setShow]  = useState(false);
+    let [contestList, setContestList] = useState([]);
+
     const [dispModal,setDispModal]=useState(0);
 
-	let socket = io(`${serverEndpoint}`);
+	let socket = props.socket;
+    console.log(socket, props.user.login);
     let navigate=useNavigate();
+
+
+    useEffect(() => {
+        const timeId = setTimeout(() => {
+          if(show === true)
+          {
+            setShow(false);
+            let notificationBar = document.getElementById('contestStartNotification')
+            if(notificationBar !== undefined && notificationBar !== null)
+            {
+                notificationBar.classList.remove('contestStartNotificationOn');
+                notificationBar.innerText = '';
+            }
+
+          }
+        }, 5000)
+    
+        return () => {
+          clearTimeout(timeId)
+        }
+      }, [show]);
+
+    useEffect(()=>{
+
+        socket.on('contestStarted',(contest)=>{
+
+            //Display a light green notification at the top of the screen saying contest is on
+            let notificationBar = document.getElementById('contestStartNotification')
+            if(notificationBar !== undefined && notificationBar !== null)
+            {
+                notificationBar.classList.add('contestStartNotificationOn');
+                notificationBar.innerText = 'Contest ' + contest['contest'] + 'has started';
+                notificationBar.addEventListener("click",()=>{
+                    navigate(`/contest/${contest['contestId']}`);
+                })
+                setShow(true);
+            }
+        })
+    },[socket]);
+
 	useEffect(()=>{
 		let doc=document.getElementById("profileDropdown-content")
 		if(ddst===true)
@@ -37,7 +84,27 @@ export default function MainPage(props) {
         }
         fetchPublicRooms();
 
+        //Get the list of questions from backend
+        let api_fetch = async () => {
+
+            let questions = await fetch(serverEndpoint + '/codeforces/questions?tags=implementation');
+            questions = await questions.json();
+            setModalQuestions(questions['questions']['result']['problems']);
+            console.log(questions['questions']['result']['problems'])
+          }
+          api_fetch();
+
+        //Get the list of contests from backend
+        let contest_fetch = async() => {
+
+            let contests = await fetch(serverEndpoint + '/getContests');
+            contests = await contests.json();
+            setContestList(contests);
+        }
+        contest_fetch();
+
     },[]);
+
 
 	let toggleDropDown=()=>{
         setddst(!ddst)
@@ -211,6 +278,45 @@ export default function MainPage(props) {
         )
     }
 
+    let createContest = async() => {
+
+        let host = props.user._id, startTime = contestTime
+        let questions = [
+                        document.getElementById('question 1').value,
+                        document.getElementById('question 2').value,
+                        document.getElementById('question 3').value,
+                        document.getElementById('question 4').value,
+                        document.getElementById('question 5').value
+                    ]
+        let size = await fetch(serverEndpoint + '/contestsSize');
+        size = await size.json();
+        let s = 1 + size['count']
+        socket.emit('createContest',{host, startTime, questions, name:'Contest ' + s},()=>{
+
+        });
+        
+    }
+
+    let joinContest = (contest_id, db_id) => {
+
+        socket.emit('joinContest',{contestId : contest_id, user : props.user, id : db_id})
+    }
+
+    //Modal for creating a contest
+    let toggleCreateContestModal = () => {
+
+        let modal = document.querySelector(".modalContest");
+        modal.classList.toggle("show-modal");
+    }
+
+    //Modal for joining a contest
+    let toggleJoinContestModal = () => {
+
+        let modal = document.querySelector("#joinModal");
+        modal.classList.toggle("show-modal");
+
+    }
+
     return Style.it(`
         .modal-rejoin-btn{
             background-color:${props.theme[4]};
@@ -286,6 +392,12 @@ export default function MainPage(props) {
         .create-room{
             background-color:${props.theme[1]};
         }
+        .modal-content-create-contest{
+            background-color:${props.theme[1]};
+        }
+        .modalContest{
+            
+        }
         .join-room{
             background-color:${props.theme[1]};
         }
@@ -336,8 +448,12 @@ export default function MainPage(props) {
             color:${props.theme[3]};
         }
 
-	`,
+	`,  
 		<div className='main-page'>
+            <div id ='contestStartNotification' className='contestStartNotification'
+            >
+
+            </div>
             {modalDisplay()}
             <div  className='main-page-wrapper'>
                 <div className="home-page-topbar" >
@@ -453,6 +569,110 @@ export default function MainPage(props) {
                     </div>
                 </div>
 
+                <div className='contest-helper-ui'>
+                    <div className='create-room create-contest' onClick={()=>toggleCreateContestModal()}>
+                        <p>Create a contest</p>
+                    </div>
+                    <div className='create-room create-contest'  onClick={() => toggleJoinContestModal()} >
+                            <p >Join a contest</p>
+                    </div>
+                </div>
+
+                <div className="modalContest">
+                    <div className="modal-content-create-contest">
+                        <span className="close-button" onClick={()=>toggleCreateContestModal()}>&times;</span>
+                        <div class="dropdown">
+                            <select name='question 1' id='question 1' className='questionOption'>
+                            {
+                                questions.map((question, index) => {
+                                    return <option key={index} value={question['contestId'] + '/' + question['index']}>
+                                        {question['name'] + '  -  ' + question['rating']}
+                                    </option>
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div class="dropdown">
+                            <select name='question 2' id='question 2' className='questionOption'>
+                            {
+                                questions.map((question, index) => {
+                                    return <option key={index} value={question['contestId'] + '/' + question['index']}>
+                                        {question['name'] + '  -  ' + question['rating']}
+                                    </option>
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div class="dropdown">
+                            <select name='question 3' id='question 3' className='questionOption'>
+                            {
+                                questions.map((question, index) => {
+                                    return <option key={index} value={question['contestId'] + '/' + question['index']}>
+                                        {question['name'] + '  -  ' + question['rating']}
+                                    </option>
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div class="dropdown">
+                            <select name='question 4' id='question 4' className='questionOption'>
+                            {
+                                questions.map((question, index) => {
+                                    return <option key={index} value={question['contestId'] + '/' + question['index']}>
+                                        {question['name'] + '  -  ' + question['rating']}
+                                    </option>
+                                })
+                            }
+                            </select>
+                        </div>
+                        <div class="dropdown">
+                            <select name='question 5' id='question 5' className='questionOption'>
+                            {
+                                questions.map((question, index) => {
+                                    return <option key={index} value={question['contestId'] + '/' + question['index']}>
+                                        {question['name'] + '  -  ' + question['rating']}
+                                    </option>
+                                })
+                            }
+                            </select>
+                        </div>
+
+                        <div className='contestTimePicker'>
+                            <p>
+                                Contest Start time
+                            </p>
+                            <DateTimePicker value={contestTime} onChange={setContestTime}></DateTimePicker>
+                        </div>
+
+                        <div className='contestTimePicker'>
+                            <button onClick={createContest}>
+                                Start the contest
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='modalContest' id='joinModal'>
+                    <div className='modal-content-create-contest'>
+                        <span className="close-button" onClick={()=>toggleJoinContestModal()}>&times;</span>
+                        <div className='contestListDisplay'>
+                            {
+                                contestList.map((contest,index) => {
+                                    console.log(contest)
+                                    return <div key={index} className='contestListDisplayItem'>
+                                                {contest['name']}
+                                                <button style={{marginLeft:"10px", marginRight:"10px", width:"30%"}}
+                                                        onClick={()=>{joinContest(contest['contestId'], contest['_id'])}}
+                                                >
+                                                    Join
+                                                </button>
+                                            </div>
+                                })
+                            }
+                        </div>
+                    </div>
+                </div>
+
                 <div className='home-public-display'>
                     {
                         publicRooms.map((room,index) => {
@@ -500,7 +720,7 @@ export default function MainPage(props) {
                                    </div>    
                         })
                     }
-                    </div>
+                </div>
             </div>
 		</div>
     )
