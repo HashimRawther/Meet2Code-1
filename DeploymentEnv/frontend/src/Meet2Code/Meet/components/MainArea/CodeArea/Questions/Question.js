@@ -18,16 +18,11 @@ export default function Question(props) {
   },[props.questionText]);
 
   return Style.it(`
-    .question-container{
-      color:${props.theme[3]};
-      background-color:${props.theme[2]};
+    .question-container img{
+      filter:${props.theme[6]};
     }
   `,
     <div className='question-container'>
-        {/* {props.questionText !== "" ?
-            <MathComponent tex={props.questionText}/> :
-            ""
-        } */}
     </div>
   )
 }

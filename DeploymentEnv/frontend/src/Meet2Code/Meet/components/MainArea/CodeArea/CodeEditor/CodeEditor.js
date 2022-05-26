@@ -9,7 +9,7 @@ import * as monaco from 'monaco-editor'
 import serverEndpoint from '../../../../../config';
 import Style from 'style-it';
 
-const monacoThemeList = ["vs", "vs-dark", "hc-black"]
+// const monacoThemeList = ["vs", "vs-dark", "hc-black"]
 let editor;
 
 export default function CodeEditor(props) {
@@ -52,7 +52,10 @@ export default function CodeEditor(props) {
         const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
         console.log(monacoBinding.doc, editor.getValue())
     
-      },[props.roomId, props.currentTab, props.codeTabs])
+        return ()=>{
+            monaco.editor.getModels().forEach(model => model.dispose());
+        }
+      },[props.roomId, props.currentTab, props.codeTabs,props.room])
       useEffect(()=>{
 
         let api_fetch = async () => {
@@ -63,7 +66,7 @@ export default function CodeEditor(props) {
         }
   
         api_fetch()
-  
+        // eslint-disable-next-line
     },[props.tag]);
   
     //Change the current tab to point to tabId
@@ -258,3 +261,17 @@ export default function CodeEditor(props) {
         </div>
     )
 }
+
+
+const returnData = () => {
+    if(editor)
+    {
+      return editor.getValue()
+    }
+    else
+    {
+      return ""
+    }
+  }
+  
+  export {returnData}

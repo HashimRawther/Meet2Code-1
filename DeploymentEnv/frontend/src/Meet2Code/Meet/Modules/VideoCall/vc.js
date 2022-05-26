@@ -101,11 +101,10 @@ function roomMediaStatus()
     }
 }
 
-function renderer(socket,myPeer, ROOM_ID, username, audioEnable = true, videEnable = true)
+function renderer(socket,myPeer, ROOM_ID, username, videoGrid, tab=1, audioEnable = true, videEnable = true)
 {
     // eslint-disable-next-line
-    console.log(ROOM_ID+"::"+username)
-    const videoGrid = document.getElementById('video-grid')      
+    console.log(ROOM_ID+"::"+username)     
     const myVideo = document.createElement('video')
     myVideo.muted = true
 

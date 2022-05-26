@@ -14,6 +14,7 @@ const mongoose = require("mongoose");
 const Room=require('./Schemas/room');
 const User=require('./Schemas/user');
 const Contest = require('./Schemas/Contest');
+const Question = require('./Schemas/QuestionTestcase');
 const { serverEndPoint } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
@@ -504,9 +505,25 @@ app.get('/contestsSize', async(req,res)=>{
     }
     catch(e)
     {
-
+        console.log(e);
     }
 });
+
+app.get('/questionTestcases', async(req,res)=>{
+
+    let {contestId, questionId} = req.query
+    try{
+
+        let testCases = await Question.findOne({contestId : contestId, questionId : questionId});
+        res.json(testCases['testCases']);
+    }
+  catch(e)
+    {
+        console.log(e);
+    }
+
+})
+
 
 app.get('/contest/:id', async(req,res) => {
 
@@ -515,10 +532,12 @@ app.get('/contest/:id', async(req,res) => {
         let contest = await Contest.findOne({contestId : contestId});
         res.json(contest);
     }
+
     catch(e)
     {
         console.log(e);
     }
+
 })
 
 server.listen(PORT,()=>{

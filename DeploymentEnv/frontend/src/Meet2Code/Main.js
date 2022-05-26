@@ -32,8 +32,7 @@ export default function Main() {
     let [user,setUser]=useState({});
     let [loggedin,setLoggedin]=useState(false);
     let [loading,setLoading]=useState(true);
-    let [socket,setSocket] = useState(io(`${serverEndpoint}`));
-
+    
     useEffect(()=>{
         getInfo();
         var connectionOptions = {
