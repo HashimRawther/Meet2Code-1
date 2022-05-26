@@ -52,6 +52,9 @@ export default function CodeEditor(props) {
         const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
         console.log(monacoBinding.doc, editor.getValue())
     
+        return ()=>{
+            monaco.editor.getModels().forEach(model => model.dispose());
+        }
       },[props.roomId, props.currentTab, props.codeTabs])
       useEffect(()=>{
 
@@ -258,3 +261,17 @@ export default function CodeEditor(props) {
         </div>
     )
 }
+
+
+const returnData = () => {
+    if(editor)
+    {
+      return editor.getValue()
+    }
+    else
+    {
+      return ""
+    }
+  }
+  
+  export {returnData}

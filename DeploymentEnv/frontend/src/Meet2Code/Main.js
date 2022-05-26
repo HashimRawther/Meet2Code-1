@@ -15,7 +15,6 @@ import Login from './OAuth/Login';
 import MainPage from './MainPage/MainPage';
 import Room from './Room/Room';
 import Contest from './Contest/Contest';
-import io from 'socket.io-client';
 let socket;
 export default function Main() {
     
@@ -33,8 +32,7 @@ export default function Main() {
     let [user,setUser]=useState({});
     let [loggedin,setLoggedin]=useState(false);
     let [loading,setLoading]=useState(true);
-    let [socket,setSocket] = useState(io(`${serverEndpoint}`));
-
+    
     useEffect(()=>{
         getInfo();
         var connectionOptions = {

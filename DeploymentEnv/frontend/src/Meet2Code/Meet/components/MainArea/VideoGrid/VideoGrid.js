@@ -9,7 +9,7 @@ export default function VideoGrid(props) {
     background-color: ${props.theme[1]};
   }
 `,
-    <div className='video-grid' id='video-panel'>
+    <div className='video-grid'>
       <VC {...props}/>
     </div>
   )
