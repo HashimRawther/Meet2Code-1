@@ -1,5 +1,6 @@
 import React from 'react';
 import '../Meet/components/MainArea/CodeArea/CodeEditor/code-editor.css';
+import './codearea.css';
 import { useState, useEffect } from 'react'
 
 import * as Y from 'yjs'
@@ -15,6 +16,8 @@ let editor;
 export default function CodeEditor(props) {
     
     const [Qpop,setQpop] = useState(false);
+    let [leaderboard, setLeaderBoard] = useState([]);
+
     useEffect(()=>{
 
         let docEditor = document.getElementById("monaco-editor-contest")
@@ -103,6 +106,20 @@ export default function CodeEditor(props) {
       props.setCodeTabs(tabsCopy)
     }
 
+    let toggleLeaderBoard = () => {
+        let modal = document.querySelector("#leaderModal");
+        modal.classList.toggle("show-modal");
+    }
+
+    let fetchLeaderBoard = async() => {
+
+        let board = await fetch(serverEndpoint + '/leaderboard/' + props.contestId);
+        board = await board.json();
+        setLeaderBoard(board);
+        console.log(board);
+        toggleLeaderBoard();
+    }
+
     return Style.it(`
         .tab{
             background-color:${props.theme[2]};
@@ -151,6 +168,15 @@ export default function CodeEditor(props) {
         .dropdown-category:hover{
             background-color:${props.theme[4]};
         }
+        .leaderboard{
+
+            background-color:${props.theme[2]};
+            color:${props.theme[3]};  
+        }
+        .leaderboard:hover{
+            background-color:${props.theme[4]};
+            color:${props.theme[3]};  
+        }
     `,
         <div className='code-editor-container'>
             <div className='tabs-bar'>
@@ -173,6 +199,30 @@ export default function CodeEditor(props) {
                     })
                 }
             </div>
+            <div className='question-picker' onClick={() => fetchLeaderBoard() }>
+                <span>
+                    Leaderboard
+                </span>
+            </div>
+
+            <div className='modalContest' id='leaderModal'>
+                <div className='modal-content-create-contest'>
+                    <span className="close-button" onClick={()=>toggleLeaderBoard()}>&times;</span>
+                    <div className='contestListDisplay'>
+                        <div className='contestListDisplayItem'>
+                            Participant   -   Score
+                        </div>
+                        {
+                            leaderboard.map((participant, index) => {
+                                return  <div key={index} className='contestListDisplayItem'>
+                                            {participant['user']}  -  {participant['score']}
+                                        </div>
+                            })
+                        }
+                    </div>
+                </div>
+            </div>
+
             <div className='utility-bar'>
                 <div className='dropdown-language' >
                     <span>
@@ -200,3 +250,16 @@ export default function CodeEditor(props) {
         </div>
     )
 }
+
+const returnData = () => {
+    if(editor)
+    {
+      return editor.getValue()
+    }
+    else
+    {
+      return ""
+    }
+  }
+  
+  export {returnData}

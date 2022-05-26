@@ -22,7 +22,7 @@ export default function Terminal(props) {
             'content-type': 'application/json',
             'Content-Type': 'application/json',
             'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-            'X-RapidAPI-Key': 'f255e11643msh97d0b871770d1b6p1cd410jsn1666b3607192'
+            'X-RapidAPI-Key': 'b0b18fb8a5mshc14ae2dbf1dd753p1488bejsnd198d70f0ce1'
         },
     };
     options["data"] = {
@@ -46,7 +46,7 @@ export default function Terminal(props) {
         params: { base64_encoded: 'true', fields: '*' },
         headers: {
             'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-            'X-RapidAPI-Key': 'f255e11643msh97d0b871770d1b6p1cd410jsn1666b3607192'
+            'X-RapidAPI-Key': 'b0b18fb8a5mshc14ae2dbf1dd753p1488bejsnd198d70f0ce1'
         }
     };
 
