@@ -3,9 +3,10 @@ import './terminal.css';
 import axios from 'axios';
 import { returnData } from '../CodeEditor/CodeEditor';
 import Style from 'style-it';
+import serverEndpoint from '../../../../../config';
 export default function Terminal(props) {
     
-  const createSubmisssion = async (userInput, expectedOutput, code) => {
+    const createSubmisssion = async (userInput, expectedOutput, code) => {
     const bcode = btoa(JSON.parse(code))
     console.log(bcode)
     const binp = btoa(userInput)
@@ -57,29 +58,20 @@ export default function Terminal(props) {
 
 const runCode = async() => {
     const code = JSON.stringify(returnData())
-    let sampletc = [
-        {
-            input: 'Hashim',
-            output: 'hello, Hashim'
-        },
-        {
-            input: 'Krishna',
-            output: 'hello, Krishna'
-        },
-        {
-            input: 'Teki',
-            output: 'hello, mrudul'
-        }
-    ]
-
+    let contestId = props.question['contestId'], questionId = props.question['index']
+    if(contestId === undefined && questionId === undefined)
+    {   
+        console.log("Question not found");
+        return;
+    }
+    let testCases = await fetch(serverEndpoint + '/questionTestcases?contestId=' + contestId + '&questionId=' + questionId);
+    testCases = await testCases.json();
     let passedtc = 0
 
-    for (let index in sampletc) {
-        let res = await createSubmisssion(sampletc[index].input, sampletc[index].output, code)
-        console.log(res)
-        if(res!==undefined && res['status']['description']=='Accepted')
+    for (let index in testCases) {
+        let res = await createSubmisssion(testCases[index].input, testCases[index].output, code)
+        if(res!==undefined && res['status']['description']==='Accepted')
         {
-            console.log(sampletc[index].input)
             passedtc+=1
         }
     }
