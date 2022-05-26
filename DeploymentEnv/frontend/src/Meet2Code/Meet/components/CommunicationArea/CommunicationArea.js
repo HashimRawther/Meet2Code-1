@@ -14,8 +14,6 @@ export default function CommunicationArea(props) {
   }
   const handleExpand = () =>{
     props.setPrevTab(props.tabs);
-    // props.setComm(3);
-    // props.setVideoGrid(document.getElementById('video-grid'));
     props.setComm(1);
     props.setTabs(0);
   }

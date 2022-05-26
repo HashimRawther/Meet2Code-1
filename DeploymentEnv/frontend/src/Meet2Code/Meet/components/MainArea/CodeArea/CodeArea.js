@@ -21,6 +21,10 @@ export default function CodeArea(props) {
     .tabOptionDisplay{
         cursor : pointer;
     }
+    .question-container{
+      color:${props.theme[3]};
+      background-color:${props.theme[2]};
+    }
   `,
     <div className='code-area'>
       <CodeEditor {...props}/>
