@@ -203,43 +203,42 @@ const CodeEditor=(props)=>{
                 </div>
               </div>
 
-              <div className='col-4' style={{textAlign:"center"}}>
-                  <button className='btn-primary' data-toggle="modal" data-target="#exampleModal">
-                    Choose a question
-                  </button>
-                  <div className="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                  <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                           Select a question
-                        </div>
-                        <div className="modal-body">
-                          <div className='dropdown'>
-                            <button className="btn btn-secondary dropdown-toggle" type="button" id="cat-select" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              Category
-                            </button>
-                            <div className="dropdown-menu" aria-labelledby="cat-select">
-                              <div className="dropdown-item" onClick={ () => setTag('2-sat')}>2-sat</div>
-                              <div className="dropdown-item" onClick={ () => setTag('fft')}>fft</div>
-                              <div className="dropdown-item" onClick={ () => setTag('implementation')}>implementation</div>
+                <div className='col-4' style={{textAlign:"center"}}>
+                    <button className='btn-primary' data-toggle="modal" data-target="#exampleModal">
+                        Choose a question
+                    </button>
+                    <div className="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div className="modal-dialog" role="document">
+                            <div className="modal-content">
+                                <div className="modal-header">
+                                Select a question
+                                </div>
+                                <div className="modal-body">
+                                    <div className='dropdown'>
+                                            <button className="btn btn-secondary dropdown-toggle" type="button" id="cat-select" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Category
+                                            </button>
+                                            <div className="dropdown-menu" aria-labelledby="cat-select">
+                                            <div className="dropdown-item" onClick={ () => setTag('2-sat')}>2-sat</div>
+                                            <div className="dropdown-item" onClick={ () => setTag('fft')}>fft</div>
+                                            <div className="dropdown-item" onClick={ () => setTag('implementation')}>implementation</div>
+                                            </div>
+                                    </div>
+                                    <div className='mt-2'>
+                                        <ul>
+                                        { modalQuestions.map(question => {
+                                            return <li style={{ "cursor" : "pointer" }} onClick = { () => {setQuestion(question) } } >
+                                                    { question['name'] } : { question['rating']}
+                                                </li>
+
+                                        }) }
+                                        </ul>
+                                    </div>
+                                <div>
                             </div>
-                          </div>
-
-                          <div className='mt-2'>
-                            <ul>
-                            { modalQuestions.map(question => {
-                                return <li style={{ "cursor" : "pointer" }} onClick = { () => {setQuestion(question) } } >
-                                          { question['name'] } : { question['rating']}
-                                      </li>
-
-                            }) }
-                            </ul>
-                          </div>
-                          <div>
-                          </div>
                         </div>
                     </div>
-                  </div>
+                </div>
                 </div>
               </div>
 

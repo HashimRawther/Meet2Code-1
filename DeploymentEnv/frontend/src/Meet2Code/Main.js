@@ -7,10 +7,14 @@ import {
   Routes,
   Route
 } from 'react-router-dom';
+import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
+
 
 import Login from './OAuth/Login';
 import MainPage from './MainPage/MainPage';
 import Room from './Room/Room';
+import Contest from './Contest/Contest';
 import io from 'socket.io-client';
 let socket;
 export default function Main() {
@@ -29,7 +33,8 @@ export default function Main() {
     let [user,setUser]=useState({});
     let [loggedin,setLoggedin]=useState(false);
     let [loading,setLoading]=useState(true);
-    
+    let [socket,setSocket] = useState(io(`${serverEndpoint}`));
+
     useEffect(()=>{
         getInfo();
         var connectionOptions = {
@@ -77,7 +82,7 @@ export default function Main() {
             return <div></div>
 
         if(loggedin===false){
-            return <Login theme={theme} setTheme={setTheme}></Login>
+            return <Login socket={socket} theme={theme} setTheme={setTheme}></Login>
         }
         else{
             return  <MainPage socket={socket} theme={theme} setTheme={setTheme} user={user} loggedin={loggedin} logOutUser={logOutUser}></MainPage>
@@ -91,7 +96,12 @@ export default function Main() {
                     <Route path='/' element={renderHome()}/>
                          
                     <Route path='/room/:id' element={
-                        <Room socket={socket} theme={theme} setTheme={setTheme} user={{...user}}></Room>}/>
+                        <Room socket={socket} theme={theme} setTheme={setTheme} user={{...user}}></Room>
+                    }/>
+
+                    <Route path='/contest/:id' element={
+                        <Contest socket={socket} theme={theme} setTheme={setTheme} user={{...user}}></Contest>
+                    } />
                 </Routes>
             </BrowserRouter>
         </div>
