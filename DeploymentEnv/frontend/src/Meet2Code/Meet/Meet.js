@@ -63,6 +63,59 @@ export default function Meet(props) {
     let [question, setQuestion] = useState(undefined);
     let [questionText, setQuestionText] = useState("");
 
+    let [codeTabs, setCodeTabs] = useState([
+
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        },
+        {
+          'theme' : 'vs-dark',
+          'language' : 'javascript',
+          'question' : undefined
+        }
+    ]);
+    let [tabLen, setTablen] = useState(4);
+    let [currentTab, setCurrentTab] = useState(0);
+    let [tag, setTag] = useState('2-sat');
+    let [modalQuestions, setModalQuestions] = useState([]);
+
     const wrapperRef = useCallback(wrapper => {
         if (wrapper == null) return
 
@@ -281,6 +334,16 @@ export default function Meet(props) {
                         questionText={questionText}
                         setQuestion={setQuestion}
                         setQuestionText={setQuestionText}
+                        codeTabs={codeTabs}
+                        setCodeTabs={setCodeTabs}
+                        tabLen={tabLen}
+                        setTablen={setTablen}
+                        currentTab={currentTab}
+                        setCurrentTab={setCurrentTab}
+                        tag={tag}
+                        setTag={setTag}
+                        modalQuestions={modalQuestions}
+                        setModalQuestions={setModalQuestions}
                         className="half-size" 
                     /> 
                     <CommunicationArea 
@@ -315,6 +378,20 @@ export default function Meet(props) {
                         settimeOut={settimeOut} 
                         wrapperRef={wrapperRef} 
                         tabs={tabs}
+                        question={question}
+                        questionText={questionText}
+                        setQuestion={setQuestion}
+                        setQuestionText={setQuestionText}
+                        codeTabs={codeTabs}
+                        setCodeTabs={setCodeTabs}
+                        tabLen={tabLen}
+                        setTablen={setTablen}
+                        currentTab={currentTab}
+                        setCurrentTab={setCurrentTab}
+                        tag={tag}
+                        setTag={setTag}
+                        modalQuestions={modalQuestions}
+                        setModalQuestions={setModalQuestions}
                         className="full-size" 
                     />
                 </div>)
