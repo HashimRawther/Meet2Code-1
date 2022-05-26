@@ -101,11 +101,10 @@ function roomMediaStatus()
     }
 }
 
-function renderer(socket,myPeer, ROOM_ID, username,tab=1, audioEnable = true, videEnable = true)
+function renderer(socket,myPeer, ROOM_ID, username, videoGrid, tab=1, audioEnable = true, videEnable = true)
 {
     // eslint-disable-next-line
-    console.log(ROOM_ID+"::"+username)
-    const videoGrid = document.getElementById(tab===0?'video-panel':'video-grid')      
+    console.log(ROOM_ID+"::"+username)     
     const myVideo = document.createElement('video')
     myVideo.muted = true
 
@@ -251,7 +250,6 @@ function renderer(socket,myPeer, ROOM_ID, username,tab=1, audioEnable = true, vi
         container.append(userInfo)
         if(container.children.length===2)
         {
-            console.log('qearfdsgsf');
             videoGrid.append(container)
             roomMediaStatus()
         }   

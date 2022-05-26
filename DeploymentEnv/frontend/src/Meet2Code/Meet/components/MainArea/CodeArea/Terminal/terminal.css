@@ -10,7 +10,6 @@
 .user-console{
     width: 90%;
     height:70%;
-    color:aqua;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -26,8 +25,22 @@
 #user-input{
     width:100%;
     height:90%;
+    background:none;
 }
 #code-output{
     width:100%;
     height:90%;
+    background:none;
+}
+.button-space{
+    width:50%;
+    height:20%;
+    display:flex;
+    align-items: center;
+    justify-content: space-around;
+}
+.button-space button{
+    width:30%;
+    height:100%;
+    border-radius: 1em;
 }
