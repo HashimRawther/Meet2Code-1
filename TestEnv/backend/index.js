@@ -354,9 +354,8 @@ app.get('/getProblem/', async(req, res)=>{
         response = await response.text();
 
         let doc = cheerio.load(response);
-        let htmlResponse = doc('.problem-statement').text();
-
-        res.send(htmlResponse);
+        let html = doc('.problem-statement').html();
+        res.send(html);
     }
     catch(exception)
     {
