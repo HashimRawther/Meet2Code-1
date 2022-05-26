@@ -24,7 +24,7 @@ export default function CodeEditor(props) {
     
         const ydocument = new Y.Doc()
     
-        const provider = new WebsocketProvider('wss://demos.yjs.dev/', props.roomId + ":" + props.currentTab, ydocument)
+        const provider = new WebsocketProvider('wss://demos.yjs.dev/', props.room + ":" + props.currentTab, ydocument)
         console.log(provider)
         const type = ydocument.getText('monaco')
     
@@ -158,7 +158,7 @@ export default function CodeEditor(props) {
             cursor:pointer;
         }
         .question-picker{
-            
+
             background-color:${props.theme[2]};
             color:${props.theme[3]};  
         }
