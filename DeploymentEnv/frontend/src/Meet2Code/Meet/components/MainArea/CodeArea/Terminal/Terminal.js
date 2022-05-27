@@ -129,12 +129,12 @@ const executeCode = async() => {
     <div className='terminal-container'>
       <div className='user-console'>
         <div className="user-input">
-          <label for="user-input">Input</label>
+          <label>Input</label>
           <textarea id="user-input" placeholder="Type your input here">
           </textarea>
         </div>
         <div className="code-output">
-          <label for="code-output">Compiler Ouput</label>
+          <label>Compiler Ouput</label>
           <textarea id="code-output" readOnly>
           </textarea>
         </div>

@@ -1,0 +1,49 @@
+#include<iostream> 
+#include<cstring> 
+#include<set> 
+#include<queue>
+#include<map>
+ 
+using namespace std;
+ 
+int c[111111];
+int res=1;
+set<int> s1,s2,s;
+map<int,int> ans;
+int n,a,b;
+queue<int> q;
+ 
+void dfs(int x) {
+    if (ans[x]) return;
+    if (!(s.count(a-x)||s1.count(a-x))) {
+        if (!(s.count(b-x)||s2.count(b-x))) res=0;
+        if (!res) return;
+        s.erase(x),s.erase(b-x),s2.insert(x),s2.insert(b-x);
+        ans[x]=1,ans[b-x]=1;
+        if (!ans[a-(b-x)]&&s.count(a-(b-x))) dfs(a-b+x);
+    }else if (!(s.count(b-x)||s2.count(b-x))) {
+        s.erase(x),s.erase(a-x),s1.insert(x),s1.insert(a-x);
+        ans[x]=2,ans[a-x]=2;
+        if (!ans[b-(a-x)]&&s.count(b-(a-x))) dfs(b-a+x);
+    }
+}
+ 
+int main() {
+ 
+    cin>>n>>a>>b;
+    for (int i=1;i<=n;i++) scanf("%d",&c[i]),s.insert(c[i]);
+    if (a==b) {
+        for (int i=1;i<=n;i++) if (!s.count(a-c[i])) res=0;
+    }else {
+        for (int i=1;i<=n;i++) if (!ans[c[i]]){
+            dfs(c[i]);
+        }
+    }
+    if (!res) printf("NO\n");else {
+        printf("YES\n");
+        for (int i=1;i<=n;i++) {
+            if (!ans[c[i]]) ans[c[i]]=1;
+            printf("%d ",2-ans[c[i]]);
+        }
+    }
+}

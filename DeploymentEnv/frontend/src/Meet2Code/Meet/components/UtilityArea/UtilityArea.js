@@ -66,10 +66,12 @@ export default function UtilityArea(props) {
     <div className='utility-area' view={props.view}>
       <div className='utility-panel'>
         <button className='screen-btn' onClick={()=>{
-          if(props.screenShare === 1) 
-            props.setScreenShare(0);
-          else 
-            props.setScreenShare(1);
+          if(props.screenShare === 1){
+            // props.stopShare();
+            props.setScreenShare(0);}
+          else {
+            props.ShareScreen();
+            props.setScreenShare(1);}
         }}>
           {
             props.screenShare === 0 ? <img id='screen-icon' src='/icons/screen.png' alt='img'/> : <img id='screen-icon' src='/icons/stop-screen.png' alt='img'/>

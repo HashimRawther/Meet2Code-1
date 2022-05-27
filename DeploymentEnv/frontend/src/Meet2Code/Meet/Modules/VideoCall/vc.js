@@ -101,10 +101,11 @@ function roomMediaStatus()
     }
 }
 
-function renderer(socket,myPeer, ROOM_ID, username, videoGrid, tab=1, audioEnable = true, videEnable = true)
+function renderer(socket,myPeer, ROOM_ID, username, audioEnable = true, videEnable = true)
 {
     // eslint-disable-next-line
-    console.log(ROOM_ID+"::"+username)     
+    console.log(ROOM_ID+"::"+username)    
+    const videoGrid = document.getElementById('video-loader') 
     const myVideo = document.createElement('video')
     myVideo.muted = true
 
@@ -154,10 +155,16 @@ function renderer(socket,myPeer, ROOM_ID, username, videoGrid, tab=1, audioEnabl
         })
 
         socket.on('user-connected', userId => {
+            console.log('new user joined',userId);
             socket.emit('peer-track-sender',ROOM_ID)
             connectToNewUser(userId, stream)
         })
 
+        socket.on('new-screen',(id,SId)=>{
+            if(socket.id === SId) return;
+            console.log('received new screen',id);
+            connectToNewScreen(id,stream);
+        })
         socket.on('peer-track-receiver', (p, media)=>{
 
             p.splice( p.indexOf(myPeer.id), 1)
@@ -186,8 +193,6 @@ function renderer(socket,myPeer, ROOM_ID, username, videoGrid, tab=1, audioEnabl
         userRemover(userId) 
         //userRemover(userId)
     })
-
-    // eslint-disable-next-line
     myPeer.on('open', id => {
 
         console.log("In peer open")
@@ -211,6 +216,47 @@ function renderer(socket,myPeer, ROOM_ID, username, videoGrid, tab=1, audioEnabl
         peers[userId] = call
         //console.log(peers)
     }   
+    function connectToNewScreen(screenId, stream) 
+    {
+        // eslint-disable-next-line
+        const call = myPeer.call(screenId, stream)
+        const video = document.createElement('video')
+        //console.log(userId)
+        console.log('calling',screenId);
+        call.on('stream', stream => {
+            console.log('call connected');
+            if(mediaId.indexOf(stream)!==-1)
+            {
+                return
+            }
+            else
+            {
+                mediaId.push(stream)
+            }
+            const screenLoader=document.getElementById('screen-loader')
+            console.log(screenLoader);
+            video.srcObject = stream
+            video.addEventListener('loadedmetadata', () => {
+                video.play()
+            })
+
+            let container = document.createElement('div')
+            container.className = "screen"
+
+            // console.log(mediaTrack)
+            container.append(video)
+            if(container.children.length>0)
+            {
+                screenLoader.append(container)
+            }
+        })
+        call.on('close', () => {
+            video.remove()
+        })
+
+        peers[screenId] = call
+        //console.log(peers)
+    } 
 
     function addVideoStream(video, stream) 
     {

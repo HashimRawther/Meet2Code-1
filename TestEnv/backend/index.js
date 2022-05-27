@@ -91,6 +91,20 @@ const defaultValue = ""
 
 io.on('connection',(socket)=>{
 
+    socket.on('screen-socket-join',(room)=>{
+        console.log(room)
+        socket.join(room);
+        socket.emit('screen-connected');
+        socket.on('screen-disconnect',(roomId,peerId)=>{
+            socket.broadcast.to(roomId).emit('screen-end',peerId);
+            socket.disconnect();
+        })
+        socket.on('sharing-screen',(roomId,id,SId) =>{
+            console.log('screen peer id ',id);
+            socket.broadcast.to(roomId).emit('new-screen',id,SId);
+        })
+    })
+
     socket.on('audio-toggle-sender', (userId, astatus,roomId) => {
 		Peer.updateOne({peerid: userId}, {
 			audioStatus: astatus, 

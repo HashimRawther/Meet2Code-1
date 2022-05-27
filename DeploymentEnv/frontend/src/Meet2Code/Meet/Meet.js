@@ -4,6 +4,7 @@ import Style from 'style-it';
 import { useParams } from 'react-router-dom';
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
+import io from 'socket.io-client';
 
 import CommSwitch from './components/CommSwitch/CommSwitch';
 import CommunicationArea from './components/CommunicationArea/CommunicationArea';
@@ -24,8 +25,10 @@ import {CreatePeer} from './Modules/VideoCall/peer-init';
 import {renderer} from './Modules/VideoCall/vc';
 
 let myPeer;
+let screenSocket;
+let screenPeer;
+let screenPeers={};
 const SAVE_INTERVAL_MS = 2000;
-const videoGrid = document.createElement('div');
 const TOOLBAR_OPTIONS = [
     [{ header: [1, 2, 3, 4, 5, 6, false] }],
     [{ font: [] }],
@@ -49,7 +52,7 @@ export default function Meet(props) {
     const [audioState, setAudioState] = useState(true);
     const [showInviteModal,setShowInviteModal] = useState(0);
     
-
+    const [screenPeerId,setScreenPeerId] = useState('');
     const { id: roomID } = useParams()
     const [name, setName] = useState('');
     const [room, setRoom] = useState('');
@@ -159,7 +162,6 @@ export default function Meet(props) {
     }, []);
 
     useEffect(() => {
-        console.log('joining');
         myPeer = CreatePeer();
         setRoom(roomID);
         let name = props.user.login;
@@ -235,24 +237,79 @@ export default function Meet(props) {
 
     }, [question])
 
+
     useEffect(()=>{
-        videoGrid.setAttribute('id','video-grid');
-    },[])
-    useEffect(()=>{
-        while(myPeer === undefined || myPeer === null);
-        if(myPeer !== undefined && myPeer !== null && props.socket!==undefined && props.socket !== null)
+        if(room !=='' && name!=='' && myPeer !== undefined && myPeer !== null && props.socket!==undefined && props.socket !== null)
         {
-            console.log('hi');
-            renderer(props.socket,myPeer, room, name,tabs,videoGrid)
+            console.log(room,name);
+            renderer(props.socket,myPeer, room, name,audioState,videoState);
         }
-    },[props.socket, room, name, tabs]);
+        //eslint-disable-next-line
+    },[room,name]);
+
+    function connectToNewUser(destId, stream,peer) 
+    {
+        // eslint-disable-next-line
+        
+        console.log("User Joined ",destId);
+        const call = peer.call(destId, stream);
+        screenPeers[destId] = call
+        //console.log(peers)
+    }
+
+    
+
+    const ShareScreen = () =>{
+        let screenId;
+        screenSocket = io(serverEndpoint);
+        screenSocket.emit('screen-socket-join',room)
+        screenSocket.once('screen-connected',()=>{
+            screenPeer = CreatePeer();
+            screenPeer.on('open', function(id) {
+                console.log('Screen ID is: ' + id);
+                setScreenPeerId(id);
+                console.log(screenPeerId);
+                screenId=id;
+                console.log(screenId)
+            });
+        })
+        navigator.mediaDevices.getDisplayMedia({cursor:true}).then(stream=>{
+            screenPeer.on('call', call => {
+                console.log('Call Screen');
+                call.answer(stream);
+                call.on('stream',(userStream)=>{
+                    console.log('rcvd strm obj');
+                })
+            })
+            setTimeout(()=>screenSocket.emit('sharing-screen',room,screenId,props.socket.id),1000);
+            
+            screenSocket.on('user-connected',(destId)=>{
+                setTimeout(()=>connectToNewUser(destId,stream,screenPeer),1000);
+            })
+
+        })
+        screenSocket.on('user-disconnected',(userId)=>{
+            if (screenPeers[userId]) 
+            {
+                screenPeers[userId].close()
+            }
+        })
+    }
+
+    const stopShare = () => {
+        screenSocket.off();
+        for(const peer in screenPeers){
+            screenPeers[peer].close();
+        }
+        screenSocket.emit('screen-disconnect',room,screenPeerId);
+    }
 
     return Style.it(`
         .meet-app{
             background-color:${props.theme[0]};
         }
     `,
-        <div className='meet-app' view={view}>
+        <div className='meet-app' id='meet-app' view={view}>
             <div id='title-space' className='title-space'>
                 <TitleArea 
                     {...props} 
@@ -278,6 +335,8 @@ export default function Meet(props) {
                     setShowInviteModal={setShowInviteModal}
                     leaveMeet={leaveMeet}
                     myPeer={myPeer}
+                    ShareScreen={ShareScreen}
+                    stopShare={stopShare}
                 />
             </div>
             <div id='tab-switch' className='tab-switch'>
@@ -332,6 +391,7 @@ export default function Meet(props) {
                         setTag={setTag}
                         modalQuestions={modalQuestions}
                         setModalQuestions={setModalQuestions}
+                        show={comm === 3? 1: tabs ===0 ? 2:0}
                         className="half-size" 
                     /> 
                     <CommunicationArea 
@@ -349,7 +409,7 @@ export default function Meet(props) {
                         setComm={setComm} 
                         setTabs={setTabs}
                         myPeer={myPeer}
-                        videoGrid={videoGrid} 
+                        show={comm === 3? 1: tabs ===0 ? 2:0}
                     />
                 </div>) : 
                 (<div id='app-container' className='App-container'>
@@ -381,6 +441,7 @@ export default function Meet(props) {
                         setTag={setTag}
                         modalQuestions={modalQuestions}
                         setModalQuestions={setModalQuestions}
+                        show={comm === 3? 1: tabs ===0 ? 2:0}
                         className="full-size" 
                     />
                 </div>)
@@ -392,6 +453,8 @@ export default function Meet(props) {
                     setShowInviteModal={setShowInviteModal}
                 />
             </div>
+            <div id="video-loader"></div>
+            <div id="screen-loader"></div>
         </div>
     )
 }

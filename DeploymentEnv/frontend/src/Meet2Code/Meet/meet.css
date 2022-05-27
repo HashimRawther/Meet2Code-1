@@ -87,3 +87,7 @@ button:hover{
 .invite-modal[show="1"]{
     display: flex;
 }
+
+#meet-app #video-loader{
+    display: none;
+}
