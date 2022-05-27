@@ -43,6 +43,7 @@ const Contest = (props) => {
     let [tag, setTag] = useState('2-sat');
     let [modalQuestions, setModalQuestions] = useState([]);
     let [contestQuestions, setContestQuestions] = useState([]);
+    let [questionMeta, setQuestionMeta] = useState([]);
 
     let contestId = useParams()['id']
     useEffect(()=>{
@@ -52,16 +53,21 @@ const Contest = (props) => {
             let contest = await fetch(serverEndpoint + '/contest/' + contestId);
             contest = await contest.json();
 
-            let questionsHtml = []
+            let questionsHtml = [], questionMetaInfo = []
             for(let question of contest['questions'])
             {
                 let [cid, pid] = question.split('/');
+                questionMetaInfo.push({
+                    'contestId' : cid,
+                    'questionId' : pid
+                });
                 let questionHtml = await fetch( serverEndpoint + '/getProblem/?contest=' + cid + '&id=' + pid );
                 questionHtml = await questionHtml.text()
                 questionsHtml.push(questionHtml);
             }
 
             setContestQuestions(questionsHtml);
+            setQuestionMeta(questionMetaInfo);
         }
         fetch_questions()
 
@@ -95,6 +101,7 @@ const Contest = (props) => {
                 modalQuestions={modalQuestions}
                 setModalQuestions={setModalQuestions}
                 questionsHtml = {contestQuestions}
+                questionMeta = {questionMeta}
                 ></CodeArea>
             </div>
     )

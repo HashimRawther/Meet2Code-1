@@ -342,7 +342,13 @@ io.on('connection',(socket)=>{
                 startTime : arg.startTime,
                 host : arg.host,
                 name :  arg.name,
-                questions : arg.questions
+                questions : arg.questions,
+                participants : [
+                    {
+                        participant : arg.host,
+                        score : 0
+                    }
+                ]
             });
             contest=await contest.save()
             console.log(arg.startTime)
@@ -551,6 +557,46 @@ app.get('/contest/:id', async(req,res) => {
     {
         console.log(e);
     }
+
+});
+
+app.post('/addScore/contest', async(req,res)=>{
+
+    let contestId = req.body.contestId;
+    let contest = await Contest.findOne({contestId : contestId});
+    let user = await User.findById(req.body.userId);
+
+    for(let participant of contest['participants'])
+    {
+        if(String(participant['participant']) === String(req.body.userId))
+        {   
+            let to_add = Number(req.body.problemNumber) * 10;
+            participant['score'] += to_add;
+            await contest.save();
+
+        }
+    }
+
+});
+
+
+app.get('/leaderboard/:id', async(req,res) => {
+
+    let contestId = req.params.id;
+    let contest = await Contest.findOne({contestId : contestId});
+
+    let leaderboard = []
+    for(let participant of contest['participants'])
+    {
+        let user = await User.findById(participant['participant'])
+        user = user['login'];
+        leaderboard.push({
+            user : user,
+            score : participant['score']
+        });
+    }
+
+    res.json(leaderboard);
 
 })
 
