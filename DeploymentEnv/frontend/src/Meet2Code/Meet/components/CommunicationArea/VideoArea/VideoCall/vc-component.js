@@ -1,12 +1,16 @@
 import React, { useEffect } from 'react';
-import VideoGrid from '../../../MainArea/VideoGrid/VideoGrid';
 import './vc.css';
 
 export default function VC(props) {
     useEffect(()=>{
-        if(props.tabs === 0){
-            const videoContainer = document.getElementById('video-container');
+        const videoContainer = document.getElementById(props.show===1?'video-container':props.show===2?'video-grid-block':'not-display');
+        const videoGrid = document.getElementById('video-loader');
+    
+        videoContainer.appendChild(videoGrid);
+        return()=>{
+            const meetApp = document.getElementById('meet-app');
+            meetApp.appendChild(videoGrid);
         }
-    },[props.tabs])
-    return(<div id={'video-container'}></div>);
+    },[props.show])
+    return(<div id={props.show===1?'video-container':props.show===2?'video-grid-block':'not-display'}></div>);
 }

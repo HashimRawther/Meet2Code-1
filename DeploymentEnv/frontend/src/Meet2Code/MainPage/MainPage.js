@@ -20,10 +20,7 @@ export default function MainPage(props) {
     let [contestList, setContestList] = useState([]);
 
     const [dispModal,setDispModal]=useState(0);
-
-	  let socket = props.socket;
-    console.log(socket, props.user.login);
-
+    let socket = props.socket;
     let navigate=useNavigate();
 
 
@@ -90,7 +87,6 @@ export default function MainPage(props) {
             let questions = await fetch(serverEndpoint + '/codeforces/questions?tags=2-sat');
             questions = await questions.json();
             setModalQuestions(questions['questions']['result']['problems']);
-            console.log(questions['questions']['result']['problems'])
           }
           api_fetch();
 
@@ -582,7 +578,7 @@ export default function MainPage(props) {
                 <div className="modalContest">
                     <div className="modal-content-create-contest">
                         <span className="close-button" onClick={()=>toggleCreateContestModal()}>&times;</span>
-                        <div class="dropdown">
+                        <div className="dropdown">
                             <select name='question 1' id='question 1' className='questionOption'>
                             {
                                 questions.map((question, index) => {
@@ -593,7 +589,7 @@ export default function MainPage(props) {
                             }
                             </select>
                         </div>
-                        <div class="dropdown">
+                        <div className="dropdown">
                             <select name='question 2' id='question 2' className='questionOption'>
                             {
                                 questions.map((question, index) => {
@@ -604,7 +600,7 @@ export default function MainPage(props) {
                             }
                             </select>
                         </div>
-                        <div class="dropdown">
+                        <div className="dropdown">
                             <select name='question 3' id='question 3' className='questionOption'>
                             {
                                 questions.map((question, index) => {
@@ -615,7 +611,7 @@ export default function MainPage(props) {
                             }
                             </select>
                         </div>
-                        <div class="dropdown">
+                        <div className="dropdown">
                             <select name='question 4' id='question 4' className='questionOption'>
                             {
                                 questions.map((question, index) => {
@@ -626,7 +622,7 @@ export default function MainPage(props) {
                             }
                             </select>
                         </div>
-                        <div class="dropdown">
+                        <div className="dropdown">
                             <select name='question 5' id='question 5' className='questionOption'>
                             {
                                 questions.map((question, index) => {

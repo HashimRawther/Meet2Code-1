@@ -57,8 +57,12 @@
 	width:100%;
 	height: 100%;;
 }
+#video-grid-block{
+	width:100%;
+	height: 100%;;
+}
 
-#video-grid {
+#video-container #video-loader {
 	height: 80%;
 	overflow-y: auto;
 	position: relative;
@@ -72,7 +76,7 @@
 	top:7%;
 }
 
-#video-panel{
+#video-grid-block #video-loader{
     height:100%;
     width:100%;
     border-radius: 1em;
