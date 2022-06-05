@@ -68,22 +68,27 @@ export default function Meet(props) {
     const [save, setSave] = useState(0);
     let [question, setQuestion] = useState(undefined);
     let [questionText, setQuestionText] = useState("");
-
+    let LangId = {
+        'c': 50,
+        'cpp': 54,
+        'java': 63,
+        'python': 71
+    }
     let [codeTabs, setCodeTabs] = useState([
 
         {
           'theme' : 'vs-dark',
-          'language' : 'javascript',
+          'language' : 'cpp',
           'question' : undefined
         },
         {
           'theme' : 'vs-dark',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         },
         {
           'theme' : 'vs-dark',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         }
         
@@ -392,6 +397,7 @@ export default function Meet(props) {
                         modalQuestions={modalQuestions}
                         setModalQuestions={setModalQuestions}
                         show={comm === 3? 1: tabs ===0 ? 2:0}
+                        LangId = {LangId}
                         className="half-size" 
                     /> 
                     <CommunicationArea 
@@ -442,6 +448,7 @@ export default function Meet(props) {
                         modalQuestions={modalQuestions}
                         setModalQuestions={setModalQuestions}
                         show={comm === 3? 1: tabs ===0 ? 2:0}
+                        LangId = {LangId}
                         className="full-size" 
                     />
                 </div>)

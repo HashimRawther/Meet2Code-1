@@ -26,10 +26,11 @@ export default function Terminal(props) {
         },
     };
     options["data"] = {
-        "language_id": 52, // C language
+        "language_id": props.LangId[props.codeTabs[props.currentTab]['language']], // C language
         "source_code": bcode,
         "stdin": binp
     }
+    console.log(options['data']);
 
     if (expectedOutput !== null && expectedOutput !== undefined) {
         options['data']['expected_output'] = expout

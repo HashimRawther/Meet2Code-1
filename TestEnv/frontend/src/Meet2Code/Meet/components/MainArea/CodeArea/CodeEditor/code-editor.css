@@ -10,6 +10,11 @@
     border-radius: 1em;
 }
 
+#monaco-editor-container{
+    height: 90%;
+    width: 100%;
+    border-radius: 1em;
+}
 .tabs-bar{
     width: calc(100% - 2em);
     height:5%;
