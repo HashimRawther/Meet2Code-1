@@ -15,7 +15,7 @@ const Room=require('./Schemas/room');
 const User=require('./Schemas/user');
 const Contest = require('./Schemas/Contest');
 const Question = require('./Schemas/QuestionTestcase');
-const { serverEndPoint } = require('./config');
+const { serverEndPoint, clientEndPoint } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
 // const {ExpressPeerServer} = require('peer');
@@ -30,7 +30,7 @@ const cron = require('node-cron');
 
 
 app.use(router);
-app.use(cors({credentials:true, origin:["http://localhost:3000"]}));
+app.use(cors({credentials:true, origin:[clientEndPoint]}));
 app.options('*', cors());
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json({limit: '50mb'}));   
@@ -42,11 +42,11 @@ app.use(session({
     saveUninitialized:true,
     name:"meet2codeCookie",
     cookie : {
-          maxAge: 1000* 60 * 60 *24 * 365,
-          secure:false,
-      }
-
+        maxAge: 1000* 60 * 60 *24 * 365,
+        secure: false,
+    }
 }))
+app.enable('trust proxy');
 
 let loggedinUserDetails=(req,res,next)=>{
     let loggedin=0;
@@ -81,7 +81,7 @@ let notLoggedin=(req,res,next)=>{
 const server = http.createServer(app);
 const io = socket(server,{cors: {
     cors: true,
-      origins: ["http://localhost:3000","192.168.0.13:3000","https://60a2be5a6ea5e300a1a9aca2--elegant-edison-5499d4.netlify.app"],
+      origins: [clientEndPoint],
       methods: ["GET", "POST"]
     }
 });
@@ -438,6 +438,7 @@ app.use('/oauth',oauth);
 app.use('/room',room);
 
 app.get('/getProblem/', async(req, res)=>{
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
 
     let {contest, id} = req.query
     try{
@@ -458,6 +459,7 @@ app.get('/getProblem/', async(req, res)=>{
 
 app.get('/codeforces/questions', async(req,res)=>{
 
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     let {tags} = req.query
     if(tags === undefined)
         tags = "2-sat"
@@ -477,6 +479,7 @@ app.get('/codeforces/questions', async(req,res)=>{
 });
 
 app.get('/publicRooms', async(req,res) => {
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
 
     const rooms = await Room.find().populate('host').populate('participants');
     let response = []
@@ -505,6 +508,7 @@ app.get('/publicRooms', async(req,res) => {
 });
 
 app.get('/getContests',async(req,res)=>{
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
 
     try{
         let contests = await Contest.find();
@@ -518,6 +522,7 @@ app.get('/getContests',async(req,res)=>{
 });
 
 app.get('/contestsSize', async(req,res)=>{
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     try{
         let count = await Contest.countDocuments();
         console.log(count);
@@ -530,6 +535,7 @@ app.get('/contestsSize', async(req,res)=>{
 });
 
 app.get('/questionTestcases', async(req,res)=>{
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
 
     let {contestId, questionId} = req.query
     try{
@@ -546,6 +552,7 @@ app.get('/questionTestcases', async(req,res)=>{
 
 
 app.get('/contest/:id', async(req,res) => {
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
 
     let contestId = req.params.id
     try{
@@ -581,7 +588,8 @@ app.post('/addScore/contest', async(req,res)=>{
 
 
 app.get('/leaderboard/:id', async(req,res) => {
-
+    
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     let contestId = req.params.id;
     let contest = await Contest.findOne({contestId : contestId});
 

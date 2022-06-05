@@ -1,0 +1,97 @@
+#include <bits/stdc++.h>
+#define ll long long
+#define pb push_back
+#define mp make_pair
+#define mt make_tuple 
+ 
+using namespace std;
+ 
+int n, m; 
+vector<int> color;
+vector< vector<int> > connect;
+ 
+bool bpg( int i , int c ){
+ 
+    color[i] = c;
+ 
+    for( int j = 0; j < connect[i].size(); j++ ){
+        if( color[connect[i][j]] == c ){ return false; }
+        else if ( color[connect[i][j]] == -1 ){
+            bool tryy = bpg( connect[i][j], 1-c );
+            if( !tryy ){ return false; }
+        }
+    }
+ 
+    return true;
+}
+ 
+void solve(){
+ 
+    cin >> n >> m;
+ 
+    color.resize( m, -1 );
+    connect.resize(m);
+ 
+    vector< pair<int,int> > original;
+ 
+    original.resize(m);
+ 
+    for( int i = 0; i < m; i++ ){
+ 
+        cin >> original[i].first >> original[i].second;
+ 
+        if( original[i].first > original[i].second ){ swap( original[i].first, original[i].second ); }
+    }
+ 
+    for( int i = 0; i < m; i++ ){
+ 
+        for( int j = i+1; j < m; j++ ){
+ 
+            if( original[i].first == original[j].first || original[i].first == original[j].second ||
+                original[i].second == original[j].first || original[i].second == original[j].second ){
+                continue;
+            }
+ 
+            bool test1 = original[i].first <= original[j].first && original[j].first <= original[i].second;
+            bool test2 = original[i].first <= original[j].second && original[j].second <= original[i].second;
+ 
+            //cout << "first bridge: " << original[i].first << " " << original[i].second << endl;
+            //cout << "secon bridge: " << original[j].first << " " << original[j].second << endl;
+ 
+            //cout << "test results " << test1 << " " << test2 << endl;
+ 
+            if( test1 != test2 ){
+                connect[i].pb(j);
+                connect[j].pb(i);
+ 
+                //cout << i << " " << j << endl;
+            }
+        }
+    }
+ 
+    for( int i = 0; i < m; i++ ){
+        if( color[i] == -1 ){
+            bool check = bpg(i,0); 
+            if( !check ){ cout << "Impossible" << endl; return; }
+        }
+    }
+ 
+    for( int i = 0; i < m; i++ ){
+        cout << ( color[i] ? 'i' : 'o' );
+    }
+ 
+    cout << endl;
+ 
+    return;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0); cout.tie(0);
+ 
+    int t = 1;
+    //cin >> t;
+    while (t--) { solve(); }
+ 
+    return 0;
+}

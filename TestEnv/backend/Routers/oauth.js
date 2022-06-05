@@ -31,7 +31,7 @@ let getGitUser=async(access_token)=>{
 }
 
 router.get('/isloggedin',async(req,res)=>{
-    
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     if(req.session.loggedin===true){
         res.status(200).json({user:req.session.user, loggedin:true})
     }
@@ -45,7 +45,7 @@ router.post('/logout',(req,res)=>{
 })
 
 router.get('/git',(req,res)=>{
-
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     if(req.session.loggedin===true){        //If user is already loggedin redirect to loginPage
         return res.redirect(`${clientEndPoint}`)
     }
@@ -53,6 +53,8 @@ router.get('/git',(req,res)=>{
 })
 
 router.get('/gitCallBack/getToken',async(req,res)=>{
+    
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     let {code}=req.query
     try{
         let resp=await getAccessToken(code)
@@ -87,6 +89,7 @@ router.get('/gitCallBack/getToken',async(req,res)=>{
 })
 
 router.get('/gitCallBack/getRepos',async(req,res)=>{
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     let {code}=req.query
     try{
         let resp=await getAccessToken(code)
@@ -104,6 +107,7 @@ router.get('/gitCallBack/getRepos',async(req,res)=>{
 
 
 router.get('/gitCallBack',(req,res)=>{
+    res.set('Access-Control-Allow-Origin', clientEndPoint);
     let {code}=req.query
     if(code===undefined){
         return res.redirect(`${clientEndPoint}`)
@@ -111,6 +115,7 @@ router.get('/gitCallBack',(req,res)=>{
 })
 
 router.post('/google',async(req,res)=>{
+    console.log(req.body);
     let user=await User.findOne({login:req.body.user.login, oauth:"google"})
     // console.log(user)
     if(user===undefined || user===null){
@@ -127,7 +132,7 @@ router.post('/google',async(req,res)=>{
     req.session.access_token=req.body.access_token
     req.session.user._id=user._id
     req.session.user.oauth='google'
-
+    console.log(req.session);
     res.status(200).json({"message":"Success"})
 })
 module.exports=router
