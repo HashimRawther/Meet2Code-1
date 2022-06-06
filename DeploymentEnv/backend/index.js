@@ -15,7 +15,7 @@ const Room=require('./Schemas/room');
 const User=require('./Schemas/user');
 const Contest = require('./Schemas/Contest');
 const Question = require('./Schemas/QuestionTestcase');
-const { serverEndPoint, clientEndPoint } = require('./config');
+const { serverEndPoint, clientEndPoint, domainName } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
 const fs = require("fs");
@@ -44,7 +44,10 @@ app.use(session({
     name:"meet2codeCookie",
     cookie : {
         maxAge: 1000* 60 * 60 *24 * 365,
-        secure: false,
+        sameSite : "none",
+        secure: true,
+        domain: domainName,
+        httpOnly: true
     }
 }))
 app.enable('trust proxy');

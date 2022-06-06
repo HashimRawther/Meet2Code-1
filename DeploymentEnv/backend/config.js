@@ -4,4 +4,5 @@ let gitConfig={
 }
 exports.serverEndPoint="https://m2c-acceptance.herokuapp.com"
 exports.clientEndPoint="https://meet2code.netlify.app"
+exports.domainName="m2c-acceptance.herokuapp.com"
 exports.gitConfig=gitConfig
