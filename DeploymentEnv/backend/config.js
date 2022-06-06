@@ -1,7 +1,7 @@
 let gitConfig={
-    clientId:"3cff0488ebac76a131ef",
-    clientSecret:"c0cd850d3c5901a9cea50dcda54c4f7668da4bf3"
+    clientId:"e51cfbad403429b4991b",
+    clientSecret:"bc39e5e76532de25b77e6192f56a5bc0f2d7b21d"
 }
-exports.serverEndPoint="http://localhost:9000"
-exports.clientEndPoint="http://localhost:3000"
+exports.serverEndPoint="https://m2c-acceptance.herokuapp.com"
+exports.clientEndPoint="https://meet2code.netlify.app"
 exports.gitConfig=gitConfig
