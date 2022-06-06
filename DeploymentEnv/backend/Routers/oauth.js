@@ -64,7 +64,6 @@ router.get('/gitCallBack/getToken',async(req,res)=>{
         resp=await getGitUser(resp.access_token)
 
         let user=await User.findOne({login:resp.login, oauth:"git"})
-        // console.log(user)
         if(user===undefined || user===null){
             user=new User({
                 login:resp.login,
@@ -115,9 +114,7 @@ router.get('/gitCallBack',(req,res)=>{
 })
 
 router.post('/google',async(req,res)=>{
-    console.log(req.body);
     let user=await User.findOne({login:req.body.user.login, oauth:"google"})
-    // console.log(user)
     if(user===undefined || user===null){
         user=new User({
             login:req.body.user.login,
@@ -132,7 +129,6 @@ router.post('/google',async(req,res)=>{
     req.session.access_token=req.body.access_token
     req.session.user._id=user._id
     req.session.user.oauth='google'
-    console.log(req.session);
     res.status(200).json({"message":"Success"})
 })
 module.exports=router
