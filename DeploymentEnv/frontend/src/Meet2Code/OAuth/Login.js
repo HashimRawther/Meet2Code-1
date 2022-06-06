@@ -81,7 +81,7 @@ const Login=(props)=>{
                       </div>
                     )}
                   }
-                    cookiePolicy={'single_host_origin'}
+                    cookiePolicy={'https://meet2code.netlify.app'}
                 />
             </div>  
         </div>
