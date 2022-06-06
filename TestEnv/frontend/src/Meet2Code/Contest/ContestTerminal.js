@@ -8,11 +8,8 @@ export default function Terminal(props) {
     
     const createSubmisssion = async (userInput, expectedOutput, code) => {
     const bcode = btoa(JSON.parse(code))
-    console.log(bcode)
     const binp = btoa(userInput)
     const expout = btoa(expectedOutput);
-
-    // console.log(binp)
 
     const options = {
         method: 'POST',
@@ -26,7 +23,7 @@ export default function Terminal(props) {
         },
     };
     options["data"] = {
-        "language_id": 52, // C language
+        "language_id": props.LangId[props.codeTabs[props.currentTab]['language']],
         "source_code": bcode,
         "stdin": binp
     }
@@ -39,7 +36,6 @@ export default function Terminal(props) {
     let outres = await axios.request(options)
 
     const subToken = outres.data["token"]
-    // console.log(subToken)
     const inoptions = {
         method: 'GET',
         url: 'https://judge0-ce.p.rapidapi.com/submissions/' + subToken,
@@ -51,7 +47,6 @@ export default function Terminal(props) {
     };
 
     let res = await axios.request(inoptions)
-    console.log(res.data)
     return res.data
 
 }
@@ -59,11 +54,9 @@ export default function Terminal(props) {
 const runCode = async() => {
     document.getElementById("code-output").value = '';
     const code = JSON.stringify(returnData())
-    console.log(props)
     let contestId = props.questionMeta[props.currentTab]['contestId'], questionId = props.questionMeta[props.currentTab]['questionId'];
     if(contestId === undefined && questionId === undefined)
     {   
-        console.log("Question not found");
         return;
     }
     let testCases = await fetch(serverEndpoint + '/questionTestcases?contestId=' + contestId + '&questionId=' + questionId);
@@ -106,14 +99,12 @@ const executeCode = async() => {
     const code = JSON.stringify(returnData())
 
     let res = await createSubmisssion(userInput, null, code)
-    console.log(res);
     if (res["stdout"] == null) {
         bout = res["compile_output"]
     }
     else {
         bout = res["stdout"]
     }
-    console.log("Bout", bout)
     const output = atob(bout)
     document.getElementById("code-output").value = output
 
@@ -147,12 +138,12 @@ const executeCode = async() => {
     <div className='terminal-container'>
       <div className='user-console'>
         <div className="user-input">
-          <label for="user-input">Input</label>
+          <label>Input</label>
           <textarea id="user-input" placeholder="Type your input here">
           </textarea>
         </div>
         <div className="code-output">
-          <label for="code-output">Compiler Ouput</label>
+          <label>Compiler Ouput</label>
           <textarea id="code-output" readOnly>
           </textarea>
         </div>

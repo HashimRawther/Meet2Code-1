@@ -18,6 +18,7 @@ const Question = require('./Schemas/QuestionTestcase');
 const { serverEndPoint, clientEndPoint } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
+const fs = require("fs");
 // const {ExpressPeerServer} = require('peer');
 
 const Document = require("./Schemas/Document")
@@ -92,7 +93,6 @@ const defaultValue = ""
 io.on('connection',(socket)=>{
 
     socket.on('screen-socket-join',(room)=>{
-        console.log(room)
         socket.join(room);
         socket.emit('screen-connected');
         socket.on('screen-disconnect',(roomId,peerId)=>{
@@ -100,7 +100,6 @@ io.on('connection',(socket)=>{
             socket.disconnect();
         })
         socket.on('sharing-screen',(roomId,id,SId) =>{
-            console.log('screen peer id ',id);
             socket.broadcast.to(roomId).emit('new-screen',id,SId);
         })
     })
@@ -146,7 +145,7 @@ io.on('connection',(socket)=>{
 			videoStatus: vstatus
 		})
 		peer.save()
-		.then((res)=>console.log('Peer saved'))
+		.then((res)=>{})
 		.catch(err=>console.log(err))
 
 		socket.on('disconnect', () => {
@@ -167,7 +166,6 @@ io.on('connection',(socket)=>{
             //Get the details of user who emitted the event
             let user=await User.findById(arg.host);
             if(user['room']!==undefined && user['room']!==null){       //Check if user is already in a room
-                // console.log(401)
                 let room=await Room.findById(user['room'])
                 if(room !== null && room !== undefined)
                 {
@@ -234,7 +232,6 @@ io.on('connection',(socket)=>{
             //Get the details of user who emitted the event
             let user=await User.findById(arg.host);
             let room=await Room.findById(user['room']);
-            // console.log(room['host'],arg.host);
             if(room === undefined || room === null)
             {
                 user['room'] = null;
@@ -270,9 +267,6 @@ io.on('connection',(socket)=>{
         }
     })
 
-    socket.on('test',arg=>{
-        // console.log(socket.rooms)
-    })
     
     socket.on('closeConnection',arg=>{
         socket.leave(`${arg.room}`)
@@ -285,7 +279,6 @@ io.on('connection',(socket)=>{
             let userRoom=await Room.findOne({roomId: room}) //Get the room details
             if(userRoom===undefined || userRoom===null){    //Room doesn't exist
                 // redirect(undefined,404)
-                console.log("cant read room");
                 return
             }
             // const {error,user}= addUser({id:socket.id,name,room});
@@ -351,7 +344,6 @@ io.on('connection',(socket)=>{
                 ]
             });
             contest=await contest.save()
-            console.log(arg.startTime)
             
             //Run a cron job for starting and ending contests
             let job = cron.schedule('* * * * *', async() => {
@@ -395,9 +387,10 @@ io.on('connection',(socket)=>{
         });
 
         contest = await contest.save();
-        if(contest['status'] === 'running')
+        console.log(contest['status'])
+        if(String(contest['status']) === String('running'))
         {
-            redirect("Already Joined",202);
+            redirect("running",202);
         }
 
     })
@@ -442,9 +435,10 @@ app.get('/getProblem/', async(req, res)=>{
 
     let {contest, id} = req.query
     try{
-        let response = await fetch("https://www.codeforces.com/problemset/problem/"+contest+"/"+id);
-        response = await response.text();
+        // let response = await fetch("https://www.codeforces.com/problemset/problem/"+contest+"/"+id);
+        // response = await response.text();
 
+        let response =  fs.readFileSync(process.cwd() + "/questionsHtml/" + contest + id + '.html').toString()
         let doc = cheerio.load(response);
         let html = doc('.problem-statement').html();
         res.send(html);
@@ -525,7 +519,6 @@ app.get('/contestsSize', async(req,res)=>{
     res.set('Access-Control-Allow-Origin', clientEndPoint);
     try{
         let count = await Contest.countDocuments();
-        console.log(count);
         res.json({count})
     }
     catch(e)

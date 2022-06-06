@@ -8,7 +8,6 @@ const Login=(props)=>{
 
     //Redirect to server for git oauth
     const gitAuth=(e)=>{
-        console.log("Getting Access Token from git....");
         window.open(`${serverEndpoint}/oauth/git`,'_self');
       }
     
@@ -26,7 +25,6 @@ const Login=(props)=>{
             body:JSON.stringify({user:user,access_token:response.accessToken})
           })
           resp=await resp.json()
-          console.log(resp);
           if(resp.message==="Success")    //If login success redirect to main page
             window.open(`/`,'_self')
         

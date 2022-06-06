@@ -46,7 +46,7 @@ const WhiteBoard = (props) => {
                     <button id='erase' onClick={()=>{setBrushColor(color);setColor('#FFFFFF')}}><img id='board-erase-icon' src='/icons/eraser.png' alt="erase"/></button>
                 </div>
                 <div>
-                    <button id='brush' onClick={()=>{setColor(brushColor);console.log(brushColor)}}><img id='board-brush-icon' src='/icons/paint-brush.png' alt="brush" /></button>
+                    <button id='brush' onClick={()=>{setColor(brushColor);}}><img id='board-brush-icon' src='/icons/paint-brush.png' alt="brush" /></button>
                 </div>
             </div>
             <div className='board-container'>

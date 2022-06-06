@@ -246,8 +246,7 @@ export default function Meet(props) {
     useEffect(()=>{
         if(room !=='' && name!=='' && myPeer !== undefined && myPeer !== null && props.socket!==undefined && props.socket !== null)
         {
-            console.log(room,name);
-            renderer(props.socket,myPeer, room, name,audioState,videoState);
+            renderer(props.socket,myPeer, room, name, audioState, videoState);
         }
         //eslint-disable-next-line
     },[room,name]);
@@ -255,11 +254,8 @@ export default function Meet(props) {
     function connectToNewUser(destId, stream,peer) 
     {
         // eslint-disable-next-line
-        
-        console.log("User Joined ",destId);
         const call = peer.call(destId, stream);
         screenPeers[destId] = call
-        //console.log(peers)
     }
 
     
@@ -271,19 +267,14 @@ export default function Meet(props) {
         screenSocket.once('screen-connected',()=>{
             screenPeer = CreatePeer();
             screenPeer.on('open', function(id) {
-                console.log('Screen ID is: ' + id);
                 setScreenPeerId(id);
-                console.log(screenPeerId);
                 screenId=id;
-                console.log(screenId)
             });
         })
         navigator.mediaDevices.getDisplayMedia({cursor:true}).then(stream=>{
             screenPeer.on('call', call => {
-                console.log('Call Screen');
                 call.answer(stream);
                 call.on('stream',(userStream)=>{
-                    console.log('rcvd strm obj');
                 })
             })
             setTimeout(()=>screenSocket.emit('sharing-screen',room,screenId,props.socket.id),1000);

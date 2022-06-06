@@ -8,11 +8,9 @@ export default function Terminal(props) {
     
     const createSubmisssion = async (userInput, expectedOutput, code) => {
     const bcode = btoa(JSON.parse(code))
-    console.log(bcode)
     const binp = btoa(userInput)
     const expout = btoa(expectedOutput);
 
-    // console.log(binp)
 
     const options = {
         method: 'POST',
@@ -26,11 +24,10 @@ export default function Terminal(props) {
         },
     };
     options["data"] = {
-        "language_id": props.LangId[props.codeTabs[props.currentTab]['language']], // C language
+        "language_id": props.LangId[props.codeTabs[props.currentTab]['language']],
         "source_code": bcode,
         "stdin": binp
     }
-    console.log(options['data']);
 
     if (expectedOutput !== null && expectedOutput !== undefined) {
         options['data']['expected_output'] = expout
@@ -40,7 +37,6 @@ export default function Terminal(props) {
     let outres = await axios.request(options)
 
     const subToken = outres.data["token"]
-    // console.log(subToken)
     const inoptions = {
         method: 'GET',
         url: 'https://judge0-ce.p.rapidapi.com/submissions/' + subToken,
@@ -52,7 +48,6 @@ export default function Terminal(props) {
     };
 
     let res = await axios.request(inoptions)
-    console.log(res.data)
     return res.data
 
 }
@@ -63,7 +58,6 @@ const runCode = async() => {
     let contestId = props.question['contestId'], questionId = props.question['index']
     if(contestId === undefined && questionId === undefined)
     {   
-        console.log("Question not found");
         return;
     }
     let testCases = await fetch(serverEndpoint + '/questionTestcases?contestId=' + contestId + '&questionId=' + questionId);
@@ -79,7 +73,6 @@ const runCode = async() => {
             passedtc+=1
         }
     }
-    console.log("PAssed: "+passedtc)
     window.alert("Passed " + passedtc+ " test cases :)")
 }
 
@@ -90,14 +83,12 @@ const executeCode = async() => {
     const code = JSON.stringify(returnData())
 
     let res = await createSubmisssion(userInput, null, code)
-    console.log(res);
     if (res["stdout"] == null) {
         bout = res["compile_output"]
     }
     else {
         bout = res["stdout"]
     }
-    console.log("Bout", bout)
     const output = atob(bout)
     document.getElementById("code-output").value = output
 

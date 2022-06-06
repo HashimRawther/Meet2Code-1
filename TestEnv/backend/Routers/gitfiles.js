@@ -11,13 +11,8 @@ router.get('/oauth/repos',async(req,res)=>{
     res.set('Access-Control-Allow-Origin', clientEndPoint);
     let {gitaccess}=req.session 
     if(gitaccess!==undefined && gitaccess!==null && gitaccess.fetched===true){      //If the resources are already fetched
-        console.log("Present already")
         return res.redirect(`${clientEndPoint}/room/${req.session.roomId}?repo_access_granted=true`)
     }
-    // else if(gitaccess===undefined || gitaccess===null){      //If query params not set from the server but directly
-    //     console.log("Undefined incorrect request")
-    //     return res.redirect(`${clientEndPoint}/room/${req.session.roomId}`)
-    // }
 
     let roomId=req.query.roomId;
     req.session.roomId=roomId;
