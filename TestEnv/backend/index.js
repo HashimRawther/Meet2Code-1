@@ -18,6 +18,7 @@ const Question = require('./Schemas/QuestionTestcase');
 const { serverEndPoint, clientEndPoint } = require('./config');
 const { v4: uuid } = require('uuid');
 const cheerio = require("cheerio");
+const fs = require("fs");
 // const {ExpressPeerServer} = require('peer');
 
 const Document = require("./Schemas/Document")
@@ -386,9 +387,10 @@ io.on('connection',(socket)=>{
         });
 
         contest = await contest.save();
-        if(contest['status'] === 'running')
+        console.log(contest['status'])
+        if(String(contest['status']) === String('running'))
         {
-            redirect("Already Joined",202);
+            redirect("running",202);
         }
 
     })
@@ -433,9 +435,10 @@ app.get('/getProblem/', async(req, res)=>{
 
     let {contest, id} = req.query
     try{
-        let response = await fetch("https://www.codeforces.com/problemset/problem/"+contest+"/"+id);
-        response = await response.text();
+        // let response = await fetch("https://www.codeforces.com/problemset/problem/"+contest+"/"+id);
+        // response = await response.text();
 
+        let response =  fs.readFileSync(process.cwd() + "/questionsHtml/" + contest + id + '.html').toString()
         let doc = cheerio.load(response);
         let html = doc('.problem-statement').html();
         res.send(html);

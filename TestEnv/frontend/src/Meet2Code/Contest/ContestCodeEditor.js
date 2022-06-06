@@ -18,17 +18,20 @@ export default function CodeEditor(props) {
 
     useEffect(()=>{
 
-        let docEditor = document.getElementById("monaco-editor-contest")
-        
-        if(!docEditor) return;
-        docEditor.innerHTML = ""
-    
-        const ydocument = new Y.Doc()
-    
+        const ydocument = new Y.Doc()    
         const provider = new WebsocketProvider(wsEndpoint, props.contestId + ":" + props.currentTab + ":" + props.user._id, ydocument)
-        const type = ydocument.getText('monaco')
+        
+        const type = ydocument.getText('monaco')    
     
-        editor = monaco.editor.create(document.getElementById('monaco-editor-contest' ), {
+        const monacoEdi = document.createElement('div');
+        monacoEdi.setAttribute('id','monaco-editor');
+        monacoEdi.setAttribute('class','monaco-editor');
+        monacoEdi.style.height='90%';
+        monacoEdi.style.width="100%";
+        monacoEdi.style.borderRadius="1em";
+        const container = document.getElementById('monaco-editor-contest');
+        container.append(monacoEdi);
+        editor = monaco.editor.create(monacoEdi, {
           value: '', // MonacoBinding overwrites this value with the content of type
           language: props.codeTabs[props.currentTab]['language'],
           theme : props.codeTabs[props.currentTab]['theme'],
@@ -46,11 +49,15 @@ export default function CodeEditor(props) {
           tabCompletion: "on",
           wordBasedSuggestions: true
         })
+
     
     
         // Bind Yjs to the editor model
         const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
-        console.log(monacoBinding.doc)
+        console.log(monacoBinding);
+        return ()=>{
+            monacoEdi.remove();
+        }
     
       },[props.contestId, props.currentTab, props.codeTabs, props.user._id]);
 
