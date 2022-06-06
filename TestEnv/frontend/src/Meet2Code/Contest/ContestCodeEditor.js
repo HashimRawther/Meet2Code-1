@@ -7,7 +7,7 @@ import * as Y from 'yjs'
 import { WebsocketProvider } from 'y-websocket'
 import { MonacoBinding } from 'y-monaco'
 import * as monaco from 'monaco-editor'
-import {serverEndpoint} from '../config';
+import {serverEndpoint, wsEndpoint} from '../config';
 import Style from 'style-it';
 
 let editor;
@@ -25,8 +25,7 @@ export default function CodeEditor(props) {
     
         const ydocument = new Y.Doc()
     
-        const provider = new WebsocketProvider('wss://demos.yjs.dev/', props.contestId + ":" + props.currentTab + ":" + props.user._id, ydocument)
-        console.log(provider)
+        const provider = new WebsocketProvider(wsEndpoint, props.contestId + ":" + props.currentTab + ":" + props.user._id, ydocument)
         const type = ydocument.getText('monaco')
     
         editor = monaco.editor.create(document.getElementById('monaco-editor-contest' ), {
@@ -51,7 +50,7 @@ export default function CodeEditor(props) {
     
         // Bind Yjs to the editor model
         const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
-        console.log(monacoBinding.doc, editor.getValue())
+        console.log(monacoBinding.doc)
     
       },[props.contestId, props.currentTab, props.codeTabs, props.user._id]);
 
@@ -114,7 +113,6 @@ export default function CodeEditor(props) {
         let board = await fetch(serverEndpoint + '/leaderboard/' + props.contestId);
         board = await board.json();
         setLeaderBoard(board);
-        console.log(board);
         toggleLeaderBoard();
     }
 
@@ -227,9 +225,10 @@ export default function CodeEditor(props) {
                         Language
                     </span>
                     <div className="dropdown-menu-language">
-                        <div className="dropdown-item" onClick={()=>changeEditor("javascript", undefined)}>Javascript</div>
-                        <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
                         <div className="dropdown-item" onClick={()=>changeEditor("c", undefined)}>C</div>
+                        <div className="dropdown-item" onClick={()=>changeEditor("cpp", undefined)}>CPP</div>
+                        <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
+                        <div className="dropdown-item" onClick={()=>changeEditor("python", undefined)}>Python</div>
                     </div>
                 </div>
 

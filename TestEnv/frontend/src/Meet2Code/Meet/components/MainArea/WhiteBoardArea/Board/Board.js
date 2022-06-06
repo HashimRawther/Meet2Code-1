@@ -4,7 +4,6 @@ import { clientEndpoint } from '../../../../../config';
 
 const Board=(props)=> {
     useEffect(()=>{
-        console.log(props.color,props.size);
         if(props.ctx===undefined) return;
         props.ctx.strokeStyle = props.color;
         props.ctx.lineWidth = props.size;

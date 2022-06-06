@@ -29,7 +29,6 @@ export default function CodeEditor(props) {
         monacoEdi.style.width="100%";
         monacoEdi.style.borderRadius="1em";
         const container = document.getElementById('monaco-editor-container');
-        console.log(container);
         container.append(monacoEdi);
         editor = monaco.editor.create(monacoEdi, {
           value: '', // MonacoBinding overwrites this value with the content of type
@@ -125,8 +124,6 @@ export default function CodeEditor(props) {
       let curTabs = [...props.codeTabs]
       curTabs[props.currentTab]['question'] = question
       props.setCodeTabs(curTabs)
-  
-      console.log(question)
       props.setQuestion(question)
   
     }
