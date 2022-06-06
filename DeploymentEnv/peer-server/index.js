@@ -23,6 +23,6 @@ app.use(peerServer);
 peerServer.on('connection',(client) => {
 })
 
-server.listen(8080,()=>{
+server.listen(port,()=>{
     console.log("Server listening on port 8080");
 });
