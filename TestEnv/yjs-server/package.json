@@ -8,7 +8,7 @@
     "url": "https://github.com/sponsors/dmonad"
   },
   "scripts": {
-    "start": "nodemon demo-server.js"
+    "start": "node demo-server.js"
   },
   "author": "Kevin Jahns <kevin.jahns@protonmail.com",
   "license": "MIT",
