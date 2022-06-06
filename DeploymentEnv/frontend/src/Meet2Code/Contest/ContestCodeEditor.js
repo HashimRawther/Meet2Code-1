@@ -7,7 +7,7 @@ import * as Y from 'yjs'
 import { WebsocketProvider } from 'y-websocket'
 import { MonacoBinding } from 'y-monaco'
 import * as monaco from 'monaco-editor'
-import {serverEndpoint} from '../config';
+import {serverEndpoint, wsEndpoint} from '../config';
 import Style from 'style-it';
 
 let editor;
@@ -18,18 +18,20 @@ export default function CodeEditor(props) {
 
     useEffect(()=>{
 
-        let docEditor = document.getElementById("monaco-editor-contest")
+        const ydocument = new Y.Doc()    
+        const provider = new WebsocketProvider(wsEndpoint, props.contestId + ":" + props.currentTab + ":" + props.user._id, ydocument)
         
-        if(!docEditor) return;
-        docEditor.innerHTML = ""
+        const type = ydocument.getText('monaco')    
     
-        const ydocument = new Y.Doc()
-    
-        const provider = new WebsocketProvider('wss://demos.yjs.dev/', props.contestId + ":" + props.currentTab + ":" + props.user._id, ydocument)
-        console.log(provider)
-        const type = ydocument.getText('monaco')
-    
-        editor = monaco.editor.create(document.getElementById('monaco-editor-contest' ), {
+        const monacoEdi = document.createElement('div');
+        monacoEdi.setAttribute('id','monaco-editor');
+        monacoEdi.setAttribute('class','monaco-editor');
+        monacoEdi.style.height='90%';
+        monacoEdi.style.width="100%";
+        monacoEdi.style.borderRadius="1em";
+        const container = document.getElementById('monaco-editor-contest');
+        container.append(monacoEdi);
+        editor = monaco.editor.create(monacoEdi, {
           value: '', // MonacoBinding overwrites this value with the content of type
           language: props.codeTabs[props.currentTab]['language'],
           theme : props.codeTabs[props.currentTab]['theme'],
@@ -47,11 +49,15 @@ export default function CodeEditor(props) {
           tabCompletion: "on",
           wordBasedSuggestions: true
         })
+
     
     
         // Bind Yjs to the editor model
         const monacoBinding = new MonacoBinding(type, editor.getModel(), new Set([editor]), provider.awareness)
-        console.log(monacoBinding.doc, editor.getValue())
+        console.log(monacoBinding);
+        return ()=>{
+            monacoEdi.remove();
+        }
     
       },[props.contestId, props.currentTab, props.codeTabs, props.user._id]);
 
@@ -114,7 +120,6 @@ export default function CodeEditor(props) {
         let board = await fetch(serverEndpoint + '/leaderboard/' + props.contestId);
         board = await board.json();
         setLeaderBoard(board);
-        console.log(board);
         toggleLeaderBoard();
     }
 
@@ -227,9 +232,10 @@ export default function CodeEditor(props) {
                         Language
                     </span>
                     <div className="dropdown-menu-language">
-                        <div className="dropdown-item" onClick={()=>changeEditor("javascript", undefined)}>Javascript</div>
-                        <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
                         <div className="dropdown-item" onClick={()=>changeEditor("c", undefined)}>C</div>
+                        <div className="dropdown-item" onClick={()=>changeEditor("cpp", undefined)}>CPP</div>
+                        <div className="dropdown-item" onClick={()=>changeEditor("java", undefined)}>Java</div>
+                        <div className="dropdown-item" onClick={()=>changeEditor("python", undefined)}>Python</div>
                     </div>
                 </div>
 

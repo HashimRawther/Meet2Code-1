@@ -37,7 +37,7 @@ export default function MainPage(props) {
             }
 
           }
-        }, 5000)
+        }, 30000)
     
         return () => {
           clearTimeout(timeId)
@@ -53,7 +53,7 @@ export default function MainPage(props) {
             if(notificationBar !== undefined && notificationBar !== null)
             {
                 notificationBar.classList.add('contestStartNotificationOn');
-                notificationBar.innerText = 'Contest ' + contest['contest'] + 'has started';
+                notificationBar.innerText = contest['contest'] + ' has started';
                 notificationBar.addEventListener("click",()=>{
                     navigate(`/contest/${contest['contestId']}`);
                 })
@@ -290,8 +290,9 @@ export default function MainPage(props) {
 
         socket.emit('joinContest',{contestId : contest_id, user : props.user, id : db_id},(status, code) => {
 
-            if(code === 202 && status === 'running')
-            {
+            if(status === 'running')
+            {   
+                console.log("running")
                 navigate('/contest/' + contest_id);
             }
 

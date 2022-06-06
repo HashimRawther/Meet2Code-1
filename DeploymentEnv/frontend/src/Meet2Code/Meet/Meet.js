@@ -68,22 +68,27 @@ export default function Meet(props) {
     const [save, setSave] = useState(0);
     let [question, setQuestion] = useState(undefined);
     let [questionText, setQuestionText] = useState("");
-
+    let LangId = {
+        'c': 50,
+        'cpp': 54,
+        'java': 63,
+        'python': 71
+    }
     let [codeTabs, setCodeTabs] = useState([
 
         {
           'theme' : 'vs-dark',
-          'language' : 'javascript',
+          'language' : 'cpp',
           'question' : undefined
         },
         {
           'theme' : 'vs-dark',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         },
         {
           'theme' : 'vs-dark',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         }
         
@@ -241,8 +246,7 @@ export default function Meet(props) {
     useEffect(()=>{
         if(room !=='' && name!=='' && myPeer !== undefined && myPeer !== null && props.socket!==undefined && props.socket !== null)
         {
-            console.log(room,name);
-            renderer(props.socket,myPeer, room, name,audioState,videoState);
+            renderer(props.socket,myPeer, room, name, audioState, videoState);
         }
         //eslint-disable-next-line
     },[room,name]);
@@ -250,11 +254,8 @@ export default function Meet(props) {
     function connectToNewUser(destId, stream,peer) 
     {
         // eslint-disable-next-line
-        
-        console.log("User Joined ",destId);
         const call = peer.call(destId, stream);
         screenPeers[destId] = call
-        //console.log(peers)
     }
 
     
@@ -266,19 +267,14 @@ export default function Meet(props) {
         screenSocket.once('screen-connected',()=>{
             screenPeer = CreatePeer();
             screenPeer.on('open', function(id) {
-                console.log('Screen ID is: ' + id);
                 setScreenPeerId(id);
-                console.log(screenPeerId);
                 screenId=id;
-                console.log(screenId)
             });
         })
         navigator.mediaDevices.getDisplayMedia({cursor:true}).then(stream=>{
             screenPeer.on('call', call => {
-                console.log('Call Screen');
                 call.answer(stream);
                 call.on('stream',(userStream)=>{
-                    console.log('rcvd strm obj');
                 })
             })
             setTimeout(()=>screenSocket.emit('sharing-screen',room,screenId,props.socket.id),1000);
@@ -392,6 +388,7 @@ export default function Meet(props) {
                         modalQuestions={modalQuestions}
                         setModalQuestions={setModalQuestions}
                         show={comm === 3? 1: tabs ===0 ? 2:0}
+                        LangId = {LangId}
                         className="half-size" 
                     /> 
                     <CommunicationArea 
@@ -442,6 +439,7 @@ export default function Meet(props) {
                         modalQuestions={modalQuestions}
                         setModalQuestions={setModalQuestions}
                         show={comm === 3? 1: tabs ===0 ? 2:0}
+                        LangId = {LangId}
                         className="full-size" 
                     />
                 </div>)
