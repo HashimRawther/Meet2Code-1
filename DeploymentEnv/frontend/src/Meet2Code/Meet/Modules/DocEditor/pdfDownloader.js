@@ -3,7 +3,6 @@ import { jsPDF } from 'jspdf';
 const savePDF = () => {
     const editors = document.getElementsByClassName('ql-editor');
     if(editors.length === 0) {
-        console.log('no element');
         return;
     }
     const input = editors[0].innerHTML;

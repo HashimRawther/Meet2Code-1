@@ -10,31 +10,36 @@ const Contest = (props) => {
     const [tabs, setTabs] = useState(1);
     let [question, setQuestion] = useState(undefined);
     let [questionText, setQuestionText] = useState("");
-
+    let LangId = {
+      'c': 50,
+      'cpp': 54,
+      'java': 63,
+      'python': 71
+    }
     let [codeTabs, setCodeTabs] = useState([
         {
           'theme' : 'vs',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         },
         {
           'theme' : 'vs',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         },
         {
           'theme' : 'vs',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         },
         {
           'theme' : 'vs',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         },
         {
           'theme' : 'vs',
-          'language' : 'javascript',
+          'language' : 'c',
           'question' : undefined
         }
     ]);
@@ -103,6 +108,7 @@ const Contest = (props) => {
                 setModalQuestions={setModalQuestions}
                 questionsHtml = {contestQuestions}
                 questionMeta = {questionMeta}
+                LangId={LangId}
                 ></CodeArea>
             </div>
     )
