@@ -8,7 +8,7 @@
     "url": "https://github.com/sponsors/dmonad"
   },
   "scripts": {
-    "start": "export PRODUCTION=1; node ./demo-server.js"
+    "start": "node demo-server.js"
   },
   "author": "Kevin Jahns <kevin.jahns@protonmail.com",
   "license": "MIT",
@@ -22,6 +22,8 @@
     "express": "^4.18.1",
     "node-static": "^0.7.11",
     "nodemon": "^2.0.16",
+    "path": "^0.12.7",
+    "peer": "^0.6.1",
     "serve": "^11.3.1",
     "standard": "^12.0.1",
     "ws": "^7.4.2",
