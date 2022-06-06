@@ -20,6 +20,12 @@ const peerServer = ExpressPeerServer(server, {
 
 app.use(peerServer);
 
+
+app.get('/',(req,res)=>{
+    console.log('hi');
+})
+
+
 peerServer.on('connection',(client) => {
 })
 
